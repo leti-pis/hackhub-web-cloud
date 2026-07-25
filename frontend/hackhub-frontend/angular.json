@@ -2,11 +2,12 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": "0a8093de-33d2-4eaf-b301-b666c5088e5c"
   },
   "newProjectRoot": "projects",
   "projects": {
-    "frontend": {
+    "hackhub-frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -59,15 +60,12 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
-          "options": {
-            "proxyConfig": "proxy.conf.json"
-          },
           "configurations": {
             "production": {
-              "buildTarget": "frontend:build:production"
+              "buildTarget": "hackhub-frontend:build:production"
             },
             "development": {
-              "buildTarget": "frontend:build:development"
+              "buildTarget": "hackhub-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
