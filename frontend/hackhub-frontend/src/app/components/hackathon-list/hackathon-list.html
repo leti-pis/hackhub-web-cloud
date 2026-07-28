@@ -1,0 +1,27 @@
+<div class="mb-3">
+  <label for="filtroStato" class="form-label">
+    Filtra per stato
+  </label>
+<select
+id="filtroStato" 
+class="form-select"
+[(ngModel)]="filtroSelezionato">
+    <option value="ISCRIZIONI_APERTE">Iscrizioni aperte</option>
+    <option value="IN_CORSO">In corso</option>
+    <option value="TUTTI_ATTIVI">Tutti gli attivi</option>
+</select>
+</div>
+<div class="row g-4">
+    @for (hackathon of hackathonsVisibili; track hackathon.nome){
+        <div class="col-12 col-md-6 col-lg-4">
+            <app-hakathon-card [hackathon]="hackathon"></app-hakathon-card>
+        </div>
+    } @empty {
+        <div class="col-12">
+            <div class="alert alert-info">
+                Nessun hackathon disponibile per questo filtro.
+            </div>
+        </div>
+    }
+</div>
+

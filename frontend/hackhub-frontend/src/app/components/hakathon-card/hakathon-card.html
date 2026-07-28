@@ -1,0 +1,30 @@
+<div class="card">
+  <div class="card-body">
+    <h2 class="card-title h5">{{ hackathon().nome }}</h2>
+    <p class="card-text">
+      Dal {{ hackathon().periodo.dataInizio }}
+      al {{ hackathon().periodo.dataFine }}
+    </p>
+    <p class="card-text">Luogo: {{ hackathon().luogo }}</p>
+    <p class="card-text">Premio: {{ hackathon().premio }} €</p>
+    <p class="card-text">{{hackathon().regolamento}}</p>
+    <p class="card-text">Scadenza iscrizioni : {{hackathon().scadenzaIscrizioni}}</p>
+    <p class="card-text">Posti rimanenti: {{hackathon().postiLiberi}}</p>
+
+    <h5 class="card-text">Staff</h5>
+
+    @for (membro of hackathon().staff; track membro.utente.nomeUtente) {
+      <p class="card-text">
+        {{ membro.utente.nomeUtente }} — {{ membro.ruolo }}
+      </p>
+    }
+    <span class="badge" [ngClass]="classeStato(hackathon().stato)">
+      {{ formattaStato(hackathon().stato) }}
+    </span>
+  </div>
+  <div class="card-footer bg-transparent">
+    <a class="btn btn-primary" [routerLink]="hackathon().idHackathon">
+      Visualizza dettagli
+    </a>
+  </div>
+</div>
