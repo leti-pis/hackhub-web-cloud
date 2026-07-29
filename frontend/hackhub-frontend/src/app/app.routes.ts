@@ -8,7 +8,7 @@ export const routes: Routes = [
         component: Home
     },
     {
-        path: 'hackathon/:id',
+        path: 'hackathons/:id',
         component: HackathonDetail
     }
 ];
