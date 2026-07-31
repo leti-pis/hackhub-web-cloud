@@ -13,7 +13,7 @@ import { Hackathon } from '../models/hackathon.model';
 export class HackathonService {
   constructor(private http: HttpClient) {}
 
-  apiUrl = "GET /api/hackathon";
+  apiUrl = "/api/hackathon";
   getHackathons() {
     return this.http.get<Hackathon[]>(this.apiUrl)
   }

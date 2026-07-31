@@ -65,7 +65,8 @@
               "buildTarget": "hackhub-frontend:build:production"
             },
             "development": {
-              "buildTarget": "hackhub-frontend:build:development"
+              "buildTarget": "hackhub-frontend:build:development",
+              "proxyConfig": "src/proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
