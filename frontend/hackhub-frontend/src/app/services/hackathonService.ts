@@ -14,7 +14,9 @@ export class HackathonService {
   constructor(private http: HttpClient) {}
 
   apiUrl = "/api/hackathon";
-  getHackathons() {
-    return this.http.get<Hackathon[]>(this.apiUrl)
+  getHackathonById(id: string) {
+    // questo simbolo ` serve per creare le template literal 
+    // (stringhe dove si può inserire direttamente il valore di variabili %{...})
+    return this.http.get<Hackathon>(`${this.apiUrl}/${id}`);
   }
 }

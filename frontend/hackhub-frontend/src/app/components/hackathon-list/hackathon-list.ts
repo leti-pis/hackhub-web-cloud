@@ -12,78 +12,82 @@ import { FormsModule } from '@angular/forms';
 export class HackathonList {
   filtroSelezionato = 'ISCRIZIONI_APERTE';
   hackathons: Hackathon[] = [
-  {
-    idHackathon: 'H-123',
-    nome: 'Hackathon Green Tech',
-    periodo: {
-      dataInizio: '2026-09-10',
-      oraInizio: '09:00',
-      dataFine: '2026-09-12',
-      oraFine: '18:00'
+    {
+        "id": "H-3e198822-391b-45de-936a-feb2819dec4a",
+        "nome": "PROVA3",
+        "dataInizio": "2027-02-19",
+        "dataFine": "2027-02-21",
+        "luogo": "Camerino",
+        "premio": 6000.00,
+        "teamMin": 3,
+        "teamMax": 6,
+        "regolamento": "Sviluppare una soluzione basata su intelligenza artificiale per supportare studenti, docenti o istituzioni formative. Il team deve dichiarare eventuali modelli, dataset e servizi esterni utilizzati.",
+        "scadenzaIscrizioni": "2027-02-08T23:59:00",
+        "stato": "ISCRIZIONI_APERTE",
+        "numeroTeamIscritti": 0,
+        "maxIscrizioni": 30,
+        "postiRimanenti": 30,
+        "nomeGiudice": null,
+        "nomeMentori": [],
+        "nomeOrganizzatore": "Organizzatore"
     },
-    luogo: 'Roma',
-    premio: 5000,
-    regolamento: 'regolamento',
-    scadenzaIscrizioni: '2026-09-08',
-    postiLiberi: 20,
-    staff: [
-      {
-        utente: {
-          nomeUtente: 'Mario Rossi'
-        },
-        ruolo: 'MENTORE'
-      }
-    ],
-    stato: 'ISCRIZIONI_APERTE'
-  },
-  {
-    idHackathon: 'H-124',
-    nome: 'Hackathon Green Tech',
-    periodo: {
-      dataInizio: '2026-09-10',
-      oraInizio: '09:00',
-      dataFine: '2026-09-12',
-      oraFine: '18:00'
+    {
+        "id": "H-59277858-85b1-45c4-979b-0e69e8f3bc30",
+        "nome": "PROVA1",
+        "dataInizio": "2027-02-19",
+        "dataFine": "2027-02-21",
+        "luogo": "Camerino",
+        "premio": 6000.00,
+        "teamMin": 3,
+        "teamMax": 6,
+        "regolamento": "Sviluppare una soluzione basata su intelligenza artificiale per supportare studenti, docenti o istituzioni formative. Il team deve dichiarare eventuali modelli, dataset e servizi esterni utilizzati.",
+        "scadenzaIscrizioni": "2027-02-08T23:59:00",
+        "stato": "ISCRIZIONI_APERTE",
+        "numeroTeamIscritti": 0,
+        "maxIscrizioni": 30,
+        "postiRimanenti": 30,
+        "nomeGiudice": null,
+        "nomeMentori": [],
+        "nomeOrganizzatore": "Organizzatore"
     },
-    luogo: 'Roma',
-    premio: 5000,
-    regolamento: 'regolamento',
-    scadenzaIscrizioni: '2026-09-08',
-    postiLiberi: 20,
-    staff: [
-      {
-        utente: {
-          nomeUtente: 'Mario Rossi'
-        },
-        ruolo: 'MENTORE'
-      }
-    ],
-    stato: 'ISCRIZIONI_CHIUSE'
-  },
-  {
-    idHackathon: 'H-125',
-    nome: 'Hackathon Green Tech',
-    periodo: {
-      dataInizio: '2026-09-10',
-      oraInizio: '09:00',
-      dataFine: '2026-09-12',
-      oraFine: '18:00'
+    {
+        "id": "H-74768733-5dbc-4d5a-a944-a67d909a7278",
+        "nome": "PROVA4",
+        "dataInizio": "2027-02-19",
+        "dataFine": "2027-02-21",
+        "luogo": "Camerino",
+        "premio": 6000.00,
+        "teamMin": 3,
+        "teamMax": 6,
+        "regolamento": "Sviluppare una soluzione basata su intelligenza artificiale per supportare studenti, docenti o istituzioni formative. Il team deve dichiarare eventuali modelli, dataset e servizi esterni utilizzati.",
+        "scadenzaIscrizioni": "2027-02-08T23:59:00",
+        "stato": "ISCRIZIONI_APERTE",
+        "numeroTeamIscritti": 0,
+        "maxIscrizioni": 30,
+        "postiRimanenti": 30,
+        "nomeGiudice": null,
+        "nomeMentori": [],
+        "nomeOrganizzatore": "Organizzatore"
     },
-    luogo: 'Roma',
-    premio: 5000,
-    regolamento: 'regolamento',
-    scadenzaIscrizioni: '2026-09-08',
-    postiLiberi: 20,
-    staff: [
-      {
-        utente: {
-          nomeUtente: 'Mario Rossi'
-        },
-        ruolo: 'MENTORE'
-      }
-    ],
-    stato: 'IN_CORSO'
-  }
+    {
+        "id": "H-9c9b4903-670a-4e72-9d73-80c2bc24aaee",
+        "nome": "PROVA2",
+        "dataInizio": "2027-02-19",
+        "dataFine": "2027-02-21",
+        "luogo": "Camerino",
+        "premio": 6000.00,
+        "teamMin": 3,
+        "teamMax": 6,
+        "regolamento": "Sviluppare una soluzione basata su intelligenza artificiale per supportare studenti, docenti o istituzioni formative. Il team deve dichiarare eventuali modelli, dataset e servizi esterni utilizzati.",
+        "scadenzaIscrizioni": "2027-02-08T23:59:00",
+        "stato": "ISCRIZIONI_APERTE",
+        "numeroTeamIscritti": 0,
+        "maxIscrizioni": 30,
+        "postiRimanenti": 30,
+        "nomeGiudice": null,
+        "nomeMentori": [],
+        "nomeOrganizzatore": "Organizzatore"
+    }
 ];
 
 get hackathonsVisibili(): Hackathon[] {

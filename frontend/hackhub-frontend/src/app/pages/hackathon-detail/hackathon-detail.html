@@ -1,1 +1,25 @@
-<p>hackathon-detail works!</p>
+@if (hackathon) {
+    <h4>{{ hackathon.nome }}</h4>
+     <p>
+      Dal {{ hackathon.dataInizio }}
+      al {{ hackathon.dataFine }}
+    </p>
+    <p>Luogo: {{ hackathon.luogo }}</p>
+    <p>Premio: {{ hackathon.premio }} €</p>
+    <p>{{hackathon.regolamento}}</p>
+    <h5>Staff</h5>
+    <p>Organizzatore: {{hackathon.nomeOrganizzatore}}</p>
+    <p>Giudice: {{hackathon.nomeGiudice}}</p>
+    <p> Mentori:
+        @for (mentore of hackathon.nomeMentori; track mentore) {
+        {{ mentore }}
+        }
+    </p>
+    <h5>Iscrizioni</h5>
+    <span class="badge" [ngClass]="classeStato(hackathon.stato)">
+      {{ formattaStato(hackathon.stato) }}
+    </span>
+    <p>Scadenza iscrizioni : {{hackathon.scadenzaIscrizioni}}</p>
+    <p>Posti rimanenti: {{hackathon.postiRimanenti}}</p>
+    <p>Membri per gruppo: da {{hackathon.teamMin}} a {{hackathon.teamMax}}</p>
+}

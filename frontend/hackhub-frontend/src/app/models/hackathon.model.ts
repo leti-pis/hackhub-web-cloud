@@ -3,14 +3,21 @@ import { Periodo } from "./periodo.model";
 import { Staff } from "./staff.model";
 
 export interface Hackathon {
-    idHackathon: string;
+    id: string;
     nome: string;
-    periodo: Periodo;
+    dataInizio: string,
+    dataFine: string,
     luogo: string;
     premio: number;
+    teamMin: number;
+    teamMax: number;
     regolamento: string;
     scadenzaIscrizioni: string;
-    postiLiberi: number;
-    staff: Staff[];
     stato: StatoHackathon;
+    numeroTeamIscritti: number;
+    maxIscrizioni: number;
+    postiRimanenti: number;
+    nomeGiudice: string | null;
+    nomeMentori: string[];
+    nomeOrganizzatore: string;
 }
