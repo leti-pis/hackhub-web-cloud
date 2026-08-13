@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HackathonService } from '../../services/hackathonService';
 import { Hackathon } from '../../models/hackathon.model';
@@ -11,7 +11,7 @@ import { NgClass } from '@angular/common';
   styleUrl: './hackathon-detail.scss',
 })
 export class HackathonDetail implements OnInit {
-  constructor(private route: ActivatedRoute, private hackathonService: HackathonService) {
+  constructor(private route: ActivatedRoute, private hackathonService: HackathonService, private cdr: ChangeDetectorRef) {
   }
 
   id: string | null = null;
@@ -31,7 +31,9 @@ export class HackathonDetail implements OnInit {
       {
         next: (h) => {
           console.log('Hackathon ricevuto:', h);
-          this.hackathon = h
+          this.hackathon = h;
+          //Avverte Angular che è cambiato qualcosa che il template usa e di ricontrollare questo componente
+          this.cdr.markForCheck();
         },
       error: (errore) => {
         console.error("Errore nella ricerca dell'hackathon", errore);

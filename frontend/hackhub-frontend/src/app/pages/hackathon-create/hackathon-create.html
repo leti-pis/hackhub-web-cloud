@@ -1,0 +1,217 @@
+<form (ngSubmit)="creaHackathon()" class="container py-3">
+
+  <div class="row g-3">
+
+    <div class="col-md-6">
+      <div class="form-floating">
+        <input type="text"
+               class="form-control"
+               [(ngModel)]="nome"
+               name="nome"
+               #controlloNome="ngModel"
+               required
+               [class.is-invalid]="controlloNome.invalid && controlloNome.touched"
+               id="nome"
+               placeholder="Nome">
+        <label for="nome">Nome</label>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-floating">
+        <input type="text"
+               class="form-control"
+               [(ngModel)]="luogo"
+               name="luogo"
+               id="luogo"
+               placeholder="Luogo">
+        <label for="luogo">Luogo</label>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="form-floating">
+        <input type="number"
+               class="form-control"
+               [(ngModel)]="premio"
+               name="premio"
+               id="premio"
+               placeholder="Premio">
+        <label for="premio">Premio €</label>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="form-floating">
+        <input type="date"
+               class="form-control"
+               [(ngModel)]="dataInizio"
+               name="dataInizio"
+               id="dataInizio">
+        <label for="dataInizio">Data di inizio</label>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="form-floating">
+        <input type="date"
+               class="form-control"
+               [(ngModel)]="dataFine"
+               name="dataFine"
+               id="dataFine">
+        <label for="dataFine">Data di conclusione</label>
+      </div>
+    </div>
+
+  </div>
+  <div class="row g-3 mt-1">
+
+  <div class="col-md-4">
+    <div class="form-floating">
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="teamMin"
+        name="teamMin"
+        min="3"
+        max="6"
+        id="teamMin"
+        placeholder="Minimo membri">
+      <label for="teamMin">Membri minimi</label>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="form-floating">
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="teamMax"
+        name="teamMax"
+        min="3"
+        max="6"
+        id="teamMax"
+        placeholder="Massimo membri">
+      <label for="teamMax">Membri massimi</label>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="form-floating">
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="maxIscrizioni"
+        name="maxIscrizioni"
+        min="1"
+        id="maxIscrizioni"
+        placeholder="Massimo iscrizioni">
+      <label for="maxIscrizioni">Massimo iscrizioni</label>
+    </div>
+  </div>
+
+</div>
+
+<div class="row g-3 mt-1">
+
+  <div class="col-md-6">
+    <div class="form-floating">
+      <input
+        type="datetime-local"
+        class="form-control"
+        [(ngModel)]="scadenzaIscrizioni"
+        name="scadenzaIscrizioni"
+        id="scadenzaIscrizioni">
+      <label for="scadenzaIscrizioni">Scadenza iscrizioni</label>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="form-floating">
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="nomeGiudice"
+        name="nomeGiudice"
+        id="nomeGiudice"
+        placeholder="Username giudice">
+      <label for="nomeGiudice">Nome utente del giudice</label>
+    </div>
+  </div>
+
+</div>
+
+<hr class="my-4">
+
+<div class="mb-4">
+
+  <div class="d-flex align-items-center gap-2 mb-2">
+    <h5 class="mb-0">Mentori</h5>
+
+    <button
+      type="button"
+      class="btn btn-primary btn-sm fw-bold"
+      (click)="aggiungiMentore()">
+      +
+    </button>
+  </div>
+
+  @for (mentore of nomeMentori; track $index) {
+
+    <div class="row g-2 mb-2">
+
+      <div class="col">
+        <input
+          type="text"
+          class="form-control"
+          [name]="'nomeMentore' + $index"
+          [(ngModel)]="nomeMentori[$index]"
+          required
+          placeholder="Nome utente del mentore">
+      </div>
+
+      <div class="col-auto">
+        <button
+          type="button"
+          class="btn btn-outline-danger"
+          (click)="rimuoviMentore($index)">
+          Rimuovi
+        </button>
+      </div>
+
+    </div>
+
+  } @empty {
+    <div class="form-text">
+      Nessun mentore inserito. Aggiungine almeno uno.
+    </div>
+  }
+</div>
+<hr>
+<div class="row g-3 mt-1">
+
+  <div class="col-12">
+    <div class="form-floating">
+      <textarea
+        class="form-control"
+        [(ngModel)]="regolamento"
+        name="regolamento"
+        id="regolamento"
+        placeholder="Regolamento completo..."
+        style="height: 140px">
+      </textarea>
+
+      <label for="regolamento">Regolamento</label>
+    </div>
+  </div>
+
+</div>
+<hr>
+
+<div class="d-flex justify-content-end">
+  <button
+    type="submit"
+    class="btn btn-primary">
+    Crea hackathon
+  </button>
+</div>
