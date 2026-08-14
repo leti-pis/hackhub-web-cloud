@@ -1,26 +1,146 @@
-<h1>Hackathon detail caricato</h1>
 @if (hackathon) {
-    <h4>{{ hackathon.nome }}</h4>
-     <p>
-      Dal {{ hackathon.dataInizio }}
-      al {{ hackathon.dataFine }}
-    </p>
-    <p>Luogo: {{ hackathon.luogo }}</p>
-    <p>Premio: {{ hackathon.premio }} €</p>
-    <p>{{hackathon.regolamento}}</p>
-    <h5>Staff</h5>
-    <p>Organizzatore: {{hackathon.nomeOrganizzatore}}</p>
-    <p>Giudice: {{hackathon.nomeGiudice}}</p>
-    <p> Mentori:
-        @for (mentore of hackathon.nomeMentori; track mentore) {
-        {{ mentore }}
-        }
-    </p>
-    <h5>Iscrizioni</h5>
-    <span class="badge" [ngClass]="classeStato(hackathon.stato)">
-      {{ formattaStato(hackathon.stato) }}
-    </span>
-    <p>Scadenza iscrizioni : {{hackathon.scadenzaIscrizioni}}</p>
-    <p>Posti rimanenti: {{hackathon.postiRimanenti}}</p>
-    <p>Membri per gruppo: da {{hackathon.teamMin}} a {{hackathon.teamMax}}</p>
+  <div class="container py-4">
+    <!-- INTESTAZIONE -->
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+      <div>
+        <h1 class="h2 mb-2">
+          {{ hackathon.nome }}
+        </h1>
+        <div class="text-body-secondary">
+          Dal
+          {{ hackathon.dataInizio }}
+          al
+          {{ hackathon.dataFine }}
+        </div>
+      </div>
+      <span
+        class="badge fs-6"
+        [ngClass]="classeStato(hackathon.stato)">
+        {{ formattaStato(hackathon.stato) }}
+      </span>
+    </div>
+    <!-- INFORMAZIONI PRINCIPALI -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="text-body-secondary small">
+              Luogo
+            </div>
+            <div class="fw-semibold">
+              {{ hackathon.luogo }}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-body-secondary small">
+              Premio
+            </div>
+            <div class="fw-semibold">
+              {{ hackathon.premio }} €
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-body-secondary small">
+              Membri per team
+            </div>
+            <div class="fw-semibold">
+              {{ hackathon.teamMin }} – {{ hackathon.teamMax }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- REGOLAMENTO -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h2 class="h5 card-title mb-3">
+          Regolamento
+        </h2>
+        <p class="card-text mb-0">
+          {{ hackathon.regolamento }}
+        </p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <!-- STAFF -->
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h2 class="h5 card-title mb-3">
+              Staff
+            </h2>
+            <div class="mb-3">
+              <div class="text-body-secondary small">
+                Organizzatore
+              </div>
+              <div>
+                {{ hackathon.nomeOrganizzatore }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="text-body-secondary small">
+                Giudice
+              </div>
+              <div>
+                {{ hackathon.nomeGiudice }}
+                <span class="text-body-secondary">
+                Nessun mentore assegnato
+                </span>
+              </div>
+            </div>
+            <div>
+              <div class="text-body-secondary small mb-1">
+                Mentori
+              </div>
+              @for (mentore of hackathon.nomeMentori; track mentore) {
+                <span class="badge text-bg-secondary me-1 mb-1">
+                  {{ mentore }}
+                </span>
+              } @empty {
+                <span class="text-body-secondary">
+                  Nessun mentore assegnato
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ISCRIZIONI -->
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h2 class="h5 card-title mb-3">
+              Iscrizioni
+            </h2>
+            <div class="mb-3">
+              <div class="text-body-secondary small">
+                Stato
+              </div>
+              <span
+                class="badge"
+                [ngClass]="classeStato(hackathon.stato)">
+                {{ formattaStato(hackathon.stato) }}
+              </span>
+            </div>
+            <div class="mb-3">
+              <div class="text-body-secondary small">
+                Scadenza iscrizioni
+              </div>
+              <div>
+                {{ formattaData(hackathon.scadenzaIscrizioni) }}
+              </div>
+            </div>
+            <div>
+              <div class="text-body-secondary small">
+                Posti rimanenti
+              </div>
+              <div class="fw-semibold">
+                {{ hackathon.postiRimanenti }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 }

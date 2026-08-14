@@ -1,27 +1,45 @@
-<div class="mb-3">
-  <label for="filtroStato" class="form-label">
-    Filtra per stato
-  </label>
-<select
-id="filtroStato" 
-class="form-select"
-[(ngModel)]="filtroSelezionato">
-    <option value="ISCRIZIONI_APERTE">Iscrizioni aperte</option>
-    <option value="IN_CORSO">In corso</option>
-    <option value="TUTTI_ATTIVI">Tutti gli attivi</option>
-</select>
-</div>
-<div class="row g-4">
-    @for (hackathon of hackathonsVisibili; track hackathon.nome){
-        <div class="col-12 col-md-6 col-lg-4">
-            <app-hakathon-card [hackathon]="hackathon"></app-hakathon-card>
+<div class="container py-3">
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="mb-1">Hackathon</h2>
+            <p class="text-body-secondary mb-0">
+                Esplora gli hackathon disponibili
+            </p>
         </div>
-    } @empty {
+        <div style="min-width: 220px;">
+            <label for="filtroStato" class="form-label fw-semibold">
+                Filtra per stato
+            </label>
+            <select id="filtroStato" class="form-select" [(ngModel)]="filtroSelezionato">
+                <option value="ISCRIZIONI_APERTE">
+                    Iscrizioni aperte
+                </option>
+                <option value="IN_CORSO">
+                    In corso
+                </option>
+                <option value="TUTTI_ATTIVI">
+                    Tutti gli attivi
+                </option>
+            </select>
+        </div>
+    </div>
+    <div class="row g-4">
+        @for (hackathon of hackathonsVisibili; track hackathon.nome) {
+        <div class="col-12 col-md-6 col-lg-4">
+            <app-hakathon-card [hackathon]="hackathon">
+            </app-hakathon-card>
+        </div>
+        } @empty {
         <div class="col-12">
-            <div class="alert alert-info">
-                Nessun hackathon disponibile per questo filtro.
+            <div class="alert alert-info text-center py-4" role="alert">
+                <h5 class="alert-heading mb-2">
+                    Nessun hackathon trovato
+                </h5>
+                <p class="mb-0">
+                    Non ci sono hackathon disponibili per il filtro selezionato.
+                </p>
             </div>
         </div>
-    }
+        }
+    </div>
 </div>
-

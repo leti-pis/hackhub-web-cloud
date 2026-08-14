@@ -48,6 +48,10 @@ export class HackathonDetail implements OnInit {
     .replace(/^./, carattere => carattere.toUpperCase());
   }
 
+  formattaData(data: string): string {
+    return data.replace('T', ' ');
+  }
+
   classeStato(stato: string): string {
     switch(stato) {
       case 'ISCRIZIONI_APERTE': return 'text-bg-success';

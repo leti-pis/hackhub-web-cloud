@@ -21,20 +21,19 @@ export class HackathonCreate {
   scadenzaIscrizioni = '';
   nomeGiudice = '';
   nomeMentore = '';
-  nomeMentori: string[] = []; 
+  nomeMentori: string[] = [];
 
   creaHackathon() {
     console.log(
-  this.nome,
-  this.dataInizio,
-  this.dataFine,
-  this.luogo,
-  this.premio
-  );
+      this.nome,
+      this.dataInizio,
+      this.dataFine,
+      this.luogo,
+      this.premio
+    );
   }
 
-
-   // Aggiunge un elemento vuoto che l'utente potrà editare nell'input
+  // Aggiunge un elemento vuoto che l'utente potrà editare nell'input
   aggiungiMentore() {
     this.nomeMentori.push('');
   }
@@ -47,5 +46,48 @@ export class HackathonCreate {
   // Funzione per tracciare gli elementi nel ciclo (evita bug di focus con ngModel)
   trackByFn(index: number, item: any) {
     return index;
+  }
+
+  oggi: string = this.dataLocaleOggi();
+  oraAttuale: string = this.dataOraLocaleAttuale();
+
+  private dataLocaleOggi(): string {
+    const oggi = new Date();
+    const anno = oggi.getFullYear();
+    const mese = String(oggi.getMonth() + 1).padStart(2, '0');
+    const giorno = String(oggi.getDate()).padStart(2, '0');
+
+    return `${anno}-${mese}-${giorno}`;
+  }
+
+  private dataOraLocaleAttuale(): string {
+    const adesso = new Date();
+    const anno = adesso.getFullYear();
+    const mese = String(adesso.getMonth() + 1).padStart(2, '0');
+    const giorno = String(adesso.getDate()).padStart(2, '0');
+    const ore = String(adesso.getHours()).padStart(2, '0');
+    const minuti = String(adesso.getMinutes()).padStart(2, '0');
+
+    return `${anno}-${mese}-${giorno}T${ore}:${minuti}`;
+  }
+
+  get teamMaxMinNonValidi(): boolean {
+    return this.teamMin != null &&
+      this.teamMax != null &&
+      this.teamMax < this.teamMin;
+  }
+
+  get dateNonValide(): boolean {
+    return !!this.dataInizio &&
+      !!this.dataFine &&
+      this.dataFine < this.dataInizio;
+  }
+
+  get scadenzaSuccessivaInizio(): boolean {
+    if (!this.scadenzaIscrizioni || !this.dataInizio) {
+      return false;
+    }
+    const inizioHackathon = `${this.dataInizio}T00:00`;
+    return this.scadenzaIscrizioni >= inizioHackathon;
   }
 }
