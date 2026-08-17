@@ -2,7 +2,8 @@
 // inserirla nei componenti tramite dependency injection
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Hackathon } from '../models/hackathon.model';
+import { Hackathon } from '../../models/hackathon.model';
+import { HackathonRequest } from '../../models/hackathon-request.model';
 
 @Injectable({
   //Significa che Angular crea un'unica istanza del service, disponibile in 
@@ -16,7 +17,12 @@ export class HackathonService {
   apiUrl = "/api/hackathon";
   getHackathonById(id: string) {
     // questo simbolo ` serve per creare le template literal 
-    // (stringhe dove si può inserire direttamente il valore di variabili %{...})
+    // (stringhe dove si può inserire direttamente il valore di variabili ${...})
     return this.http.get<Hackathon>(`${this.apiUrl}/${id}`);
   }
+
+  postHackathon(hackathon: HackathonRequest) {
+    return this.http.post<Hackathon>(this.apiUrl, hackathon);
+  }
+
 }

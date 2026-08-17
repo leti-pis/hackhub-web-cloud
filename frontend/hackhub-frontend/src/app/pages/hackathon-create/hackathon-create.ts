@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HackathonRequest } from '../../models/hackathon-request.model';
+import { HackathonService } from '../../services/hackathon-service/hackathonService';
 
 @Component({
   selector: 'app-hackathon-create',
@@ -8,6 +10,8 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './hackathon-create.scss',
 })
 export class HackathonCreate {
+
+  constructor(private hackathonService: HackathonService) {}
 
   nome = '';
   luogo = '';
@@ -20,17 +24,32 @@ export class HackathonCreate {
   regolamento = '';
   scadenzaIscrizioni = '';
   nomeGiudice = '';
-  nomeMentore = '';
   nomeMentori: string[] = [];
 
   creaHackathon() {
-    console.log(
-      this.nome,
-      this.dataInizio,
-      this.dataFine,
-      this.luogo,
-      this.premio
-    );
+    const hackathonRequest: HackathonRequest = {
+    nome: this.nome,
+    luogo: this.luogo,
+    premio: this.premio,
+    dataInizio: this.dataInizio,
+    dataFine: this.dataFine,
+    teamMin: this.teamMin,
+    teamMax: this.teamMax,
+    maxIscrizioni: this.maxIscrizioni,
+    regolamento: this.regolamento,
+    scadenzaIscrizioni: this.scadenzaIscrizioni,
+    nomeGiudice: this.nomeGiudice,
+    nomeMentori: this.nomeMentori
+  };
+    this.hackathonService.postHackathon(hackathonRequest).subscribe(
+      {
+        next: (h) => {
+          console.log('Hackathon creato:', h);
+        },
+        error: (errore) => {
+          console.error("Errore nella creazione dell'hackathon", errore);
+        }
+      });
   }
 
   // Aggiunge un elemento vuoto che l'utente potrà editare nell'input
@@ -41,11 +60,6 @@ export class HackathonCreate {
   // Rimuove l'elemento alla posizione indicata
   rimuoviMentore(index: number) {
     this.nomeMentori.splice(index, 1);
-  }
-
-  // Funzione per tracciare gli elementi nel ciclo (evita bug di focus con ngModel)
-  trackByFn(index: number, item: any) {
-    return index;
   }
 
   oggi: string = this.dataLocaleOggi();

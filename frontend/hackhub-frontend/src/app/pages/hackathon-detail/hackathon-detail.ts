@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { HackathonService } from '../../services/hackathonService';
+import { HackathonService } from '../../services/hackathon-service/hackathonService';
 import { Hackathon } from '../../models/hackathon.model';
 import { NgClass } from '@angular/common';
 
