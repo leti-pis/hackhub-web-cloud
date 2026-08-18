@@ -1,0 +1,50 @@
+<form (ngSubmit)="registrati()" class="container py-3" #registerForm="ngForm">
+    <h3 class="mb-3">Registrati</h3>
+  <div class="mb-3 form-floating">
+    <input type="text" class="form-control" [(ngModel)]="nomeUtente" name="nome" #nomeUtenteCtrl="ngModel" required [class.is-invalid]="nomeUtenteCtrl.invalid && nomeUtenteCtrl.touched" id="nome" placeholder="Nome">
+        <label for="nome">Nome</label>
+        @if (nomeUtenteCtrl.errors?.['required']) {
+        <div class="invalid-feedback">
+          Il nome utente è obbligatorio
+        </div>
+        }
+  </div>
+  <div class="mb-3 form-floating">
+    <input type="email" class="form-control" [(ngModel)]="email" name="email" #emailCtrl="ngModel" required [class.is-invalid]="emailCtrl.invalid && emailCtrl.touched" id="email" placeholder="Email">
+    <label for="email">Email</label>
+    @if (emailCtrl.errors?.['required']) {
+    <div class="invalid-feedback">
+      L'email è obbligatoria
+    </div>
+    }
+  </div>
+  <div class="mb-3 form-floating">
+    <input type="password" class="form-control" [(ngModel)]="password" name="password" #passwordCtrl="ngModel" required minlength="6" [class.is-invalid]="passwordCtrl.invalid && passwordCtrl.touched" id="password" placeholder="Password">
+    <label for="password">Password</label>
+    @if (passwordCtrl.errors?.['required']) {
+    <div class="invalid-feedback">
+      La password è obbligatoria
+    </div>
+    }
+    @if (passwordCtrl.errors?.['minlength']) {
+    <div class="invalid-feedback">
+      La password deve contenere almeno 6 caratteri
+    </div>
+    }
+  </div>
+  <button class="btn btn-primary" type="submit" [disabled]="registerForm.invalid">Crea account</button>
+  @if (erroreRegistrazione()) {
+        <div class="alert alert-danger mt-3" role="alert">
+        {{ erroreRegistrazione() }}
+
+        <p>Hai già un account? </p>
+        <a class="btn btn-primary" [routerLink]="['/login']">Accedi</a>
+        </div>
+    }
+    @if (successoRegistrazione()) {
+        <div class="alert alert-success mt-3" role="alert">
+        <p>Registrazione avvenuta con successo!</p>
+        <a class="btn btn-primary" [routerLink]="['/login']">Accedi</a>
+        </div>
+    }
+</form>

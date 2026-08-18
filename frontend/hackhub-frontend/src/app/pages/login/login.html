@@ -1,0 +1,37 @@
+<form (ngSubmit)="accedi()" class="container py-3" #loginForm="ngForm">
+    <h3 class="mb-3">Accedi</h3>
+  <div class="mb-3 form-floating">
+    <input type="text" class="form-control" [(ngModel)]="nomeUtente" name="nome" #nomeUtenteCtrl="ngModel" required [class.is-invalid]="nomeUtenteCtrl.invalid && nomeUtenteCtrl.touched" id="nome" placeholder="Nome">
+        <label for="nome">Nome</label>
+        @if (nomeUtenteCtrl.errors?.['required']) {
+        <div class="invalid-feedback">
+          Il nome utente è obbligatorio
+        </div>
+        }
+  </div>
+  <div class="mb-3 form-floating">
+    <input type="password" class="form-control" [(ngModel)]="password" name="password" #passwordCtrl="ngModel" required minlength="6" [class.is-invalid]="passwordCtrl.invalid && passwordCtrl.touched" id="password" placeholder="Password">
+    <label for="password">Password</label>
+    @if (passwordCtrl.errors?.['required']) {
+    <div class="invalid-feedback">
+      La password è obbligatoria
+    </div>
+    }
+    @if (passwordCtrl.errors?.['minlength']) {
+    <div class="invalid-feedback">
+      La password deve contenere almeno 6 caratteri
+    </div>
+    }
+  </div>
+  <button class="btn btn-primary" type="submit" [disabled]="loginForm.invalid">Accedi</button>
+    @if (erroreLogin()) {
+        <div class="alert alert-danger mt-3" role="alert">
+        {{ erroreLogin() }}
+
+        <p>Non hai un account? </p>
+        <a class="btn btn-primary" [routerLink]="['/register']">Registrati</a>
+        </div>
+    }
+
+  
+</form>
