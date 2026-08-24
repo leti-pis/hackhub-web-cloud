@@ -4,6 +4,7 @@ import { HackathonDetail } from './pages/hackathon-detail/hackathon-detail';
 import { HackathonCreate } from './pages/hackathon-create/hackathon-create';
 import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
+import { Account } from './pages/account/account';
 
 export const routes: Routes = [
     {
@@ -25,5 +26,9 @@ export const routes: Routes = [
     {
         path: 'register',
         component: Register
+    },
+    {
+        path: 'account',
+        component: Account
     }
 ];

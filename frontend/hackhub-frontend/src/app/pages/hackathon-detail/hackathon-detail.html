@@ -137,6 +137,27 @@
               <div class="fw-semibold">
                 {{ hackathon.postiRimanenti }}
               </div>
+              <button
+                class="btn btn-primary mt-3 mb-1"
+                [disabled]="!puoIscriversi(hackathon.stato, hackathon.postiRimanenti) || !isLoggedIn()"
+                (click)="iscriviti()">
+                Iscriviti
+              </button>
+                @if (!puoIscriversi(hackathon.stato, hackathon.postiRimanenti)) {
+                <p class="text-danger small">
+                  Non puoi iscriverti a questo hackathon. Prova a controllare lo stato dell'hackathon, i posti rimanenti o se sei loggato.
+                </p>
+              }
+              @if (erroreIscrizione()) {
+                <p class="text-danger small">
+                  {{ erroreIscrizione() }}
+                </p>
+              }
+              @if (successoIscrizione()) {
+                <p class="text-success small">
+                  {{ successoIscrizione() }}
+                </p>
+              }
             </div>
           </div>
         </div>

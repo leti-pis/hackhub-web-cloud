@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Hackathon } from '../../models/hackathon.model';
 import { HackathonRequest } from '../../models/hackathon-request.model';
+import { IscrizioneTeamRequest } from '../../models/iscrizione-team-request.model';
 
 @Injectable({
   //Significa che Angular crea un'unica istanza del service, disponibile in 
@@ -25,4 +26,11 @@ export class HackathonService {
     return this.http.post<Hackathon>(this.apiUrl, hackathon);
   }
 
+  postTeamRegistration(request: IscrizioneTeamRequest) {
+    return this.http.post(`${this.apiUrl}/${request.nomeHackathon}/iscrizioni`, request);
+  }
+
+  getIscrizioniUtente(nomeHackathon: string) {
+    return this.http.get<Hackathon[]>(`${this.apiUrl}/${nomeHackathon}/iscrizioni`, );
+  }
 }

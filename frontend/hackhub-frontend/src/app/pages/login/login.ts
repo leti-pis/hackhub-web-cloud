@@ -31,6 +31,7 @@ export class Login {
           console.log('Accesso riuscito:', response);
           //localStorage = memoria del browser che mantiene il valore anche dopo un refresh della pagina
           localStorage.setItem('token', response.token);
+          localStorage.setItem('nomeUtente', response.nomeUtente);
           //reindirizza l'utente alla pagina principale dopo il login
           this.router.navigate(['/']);
         },
