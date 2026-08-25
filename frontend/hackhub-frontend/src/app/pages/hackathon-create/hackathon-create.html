@@ -1,4 +1,5 @@
 <form (ngSubmit)="creaHackathon()" class="container py-3" #hackathonForm="ngForm">
+
   <h3 class="mb-3">Crea un nuovo hackathon</h3>
 
   <div class="row g-3">
@@ -261,11 +262,6 @@
           Il giudice è obbligatorio
         </div>
         }
-        @if (giudiceTraMentori) {
-        <div class="text-danger small mb-2">
-          Il giudice non può essere anche un mentore
-        </div>
-        }
 
         @if (isBlank(nomeGiudice) && giudiceCtrl.touched) {
         <div class="invalid-feedback">
@@ -273,6 +269,12 @@
         </div>
         }
       </div>
+
+      @if (giudiceTraMentori) {
+      <div class="text-danger small mt-1" role="alert" aria-live="polite">
+        Il giudice non può essere anche un mentore
+      </div>
+      }
     </div>
   </div>
 
@@ -282,19 +284,20 @@
     <div class="d-flex align-items-center gap-2 mb-2">
       <h6 class="mb-0">Mentori</h6>
 
-      <button type="button" class="btn btn-primary btn-sm fw-bold fs-6 px-2 py-0" (click)="aggiungiMentore()">
+      <button type="button" class="btn btn-primary btn-sm fw-bold fs-6 px-2 py-0" (click)="aggiungiMentore()"
+        aria-label="Aggiungi mentore">
         +
       </button>
     </div>
 
-    @for (mentore of nomeMentori; track $index) {
+    @for (mentore of nomeMentori; track mentore.id) {
     <div class="row g-2 mb-2">
       <div class="col">
-        <input type="text" class="form-control" [name]="'nomeMentore' + $index" [(ngModel)]="nomeMentori[$index]"
+        <input type="text" class="form-control" [name]="'nomeMentore' + $index" [(ngModel)]="nomeMentori[$index].nome"
           #mentoreCtrl="ngModel" required [class.is-invalid]="
-              (mentoreCtrl.invalid || isBlank(nomeMentori[$index]))
-              && mentoreCtrl.touched
-            " placeholder="Nome utente del mentore">
+            (mentoreCtrl.invalid || isBlank(mentore.nome))
+            && mentoreCtrl.touched
+          " placeholder="Nome utente del mentore">
 
         @if (mentoreCtrl.errors?.['required']) {
         <div class="invalid-feedback">
@@ -302,14 +305,9 @@
         </div>
         }
 
-        @if (isBlank(nomeMentori[$index]) && mentoreCtrl.touched) {
+        @if (isBlank(mentore.nome) && mentoreCtrl.touched) {
         <div class="invalid-feedback">
           Il nome utente del mentore non può contenere solo spazi
-        </div>
-        }
-        @if (mentoriDuplicati) {
-        <div class="text-danger small mb-2">
-          Non puoi inserire lo stesso mentore più volte
         </div>
         }
       </div>
@@ -321,8 +319,14 @@
       </div>
     </div>
     } @empty {
-    <div class="text-danger small">
+    <div class="text-danger small" role="alert" aria-live="polite">
       È necessario inserire almeno un mentore.
+    </div>
+    }
+
+    @if (mentoriDuplicati) {
+    <div class="text-danger small mt-1" role="alert" aria-live="polite">
+      Non puoi inserire lo stesso mentore più volte
     </div>
     }
   </div>
@@ -359,7 +363,7 @@
   </div>
 
   @if (error()) {
-  <div class="alert alert-danger mt-4" role="alert">
+  <div class="alert alert-danger mt-4" role="alert" aria-live="assertive">
     {{ error() }}
   </div>
   }
@@ -374,13 +378,13 @@
         isBlank(luogo) ||
         isBlank(nomeGiudice) ||
         isBlank(regolamento) ||
-        nomeMentori.some(mentore => isBlank(mentore)) ||
+        mentoreVuoto ||
         teamMaxMinNonValidi ||
         dateNonValide ||
         scadenzaPassata ||
         scadenzaSuccessivaInizio ||
         caricamento() ||
-        mentoriDuplicati || 
+        mentoriDuplicati ||
         giudiceTraMentori
       ">
 
@@ -391,4 +395,5 @@
       }
     </button>
   </div>
+
 </form>

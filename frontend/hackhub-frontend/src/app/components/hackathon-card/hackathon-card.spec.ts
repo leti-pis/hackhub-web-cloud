@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
-import { HakathonCard } from './hakathon-card';
+import { HackathonCard } from './hackathon-card';
 
-describe('HakathonCard', () => {
-  let component: HakathonCard;
-  let fixture: ComponentFixture<HakathonCard>;
+describe('HackathonCard', () => {
+  let component: HackathonCard;
+  let fixture: ComponentFixture<HackathonCard>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HakathonCard],
+      imports: [HackathonCard],
       providers: [provideRouter([])],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(HakathonCard);
+    fixture = TestBed.createComponent(HackathonCard);
     component = fixture.componentInstance;
     fixture.componentRef.setInput('hackathon', {
       id: 'test-id',

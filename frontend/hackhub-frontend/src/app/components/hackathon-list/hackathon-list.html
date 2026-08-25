@@ -10,8 +10,7 @@
             <label for="filtroStato" class="form-label fw-semibold">
                 Filtra per stato
             </label>
-            <!-- ngModelChange serve perchè filtroSelezionato è un signal, quindi il two-way binding [(ngModel)] non funziona -->
-            <select id="filtroStato" class="form-select" [ngModel]="filtroSelezionato" (ngModelChange)="filtroSelezionato.set($event)">
+            <select id="filtroStato" class="form-select" [ngModel]="filtroSelezionato()" (ngModelChange)="filtroSelezionato.set($event)">
                 <option value="ISCRIZIONI_APERTE">
                     Iscrizioni aperte
                 </option>
@@ -27,8 +26,8 @@
     <div class="row g-4">
         @for (hackathon of hackathonsVisibili(); track hackathon.id) {
         <div class="col-12 col-md-6 col-lg-4">
-            <app-hakathon-card [hackathon]="hackathon">
-            </app-hakathon-card>
+            <app-hackathon-card [hackathon]="hackathon">
+            </app-hackathon-card>
         </div>
         } @empty {
         <div class="col-12">

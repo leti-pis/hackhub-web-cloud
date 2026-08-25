@@ -73,8 +73,8 @@ export class Register {
   }
 
   private preparazioneRegistrazione(): void {
-    this.erroreRegistrazione.set(''); // Reset dell'errore prima di effettuare la richiesta
-    this.successoRegistrazione.set(''); // Reset del successo prima di effettuare la richiesta
+    this.erroreRegistrazione.set('');
+    this.successoRegistrazione.set('');
     this.registrazioneInCorso.set(true);
   }
 

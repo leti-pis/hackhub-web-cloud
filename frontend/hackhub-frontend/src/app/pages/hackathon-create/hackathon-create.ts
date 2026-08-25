@@ -27,7 +27,9 @@ export class HackathonCreate {
   regolamento = '';
   scadenzaIscrizioni = '';
   nomeGiudice = '';
-  nomeMentori: string[] = [];
+  nomeMentori: { id: number; nome: string }[] = [];
+
+  private prossimoMentoreId = 0;
 
   error = signal<string>('');
 
@@ -42,7 +44,7 @@ export class HackathonCreate {
     ).subscribe(
       {
         next: (h) => {
-          this.router.navigate(['/hackathon-card/' + h.id]);
+          this.router.navigate(['/hackathons', h.id]);
         },
         error: (errore: HttpErrorResponse) => {
           this.gestisciErrore(errore);
@@ -65,7 +67,9 @@ export class HackathonCreate {
       regolamento: this.normalizzaTesto(this.regolamento),
       scadenzaIscrizioni: this.scadenzaIscrizioni,
       nomeGiudice: this.normalizzaTesto(this.nomeGiudice),
-      nomeMentori: this.nomeMentori.map((m) => this.normalizzaTesto(m))
+      nomeMentori: this.nomeMentori.map(
+        mentore => this.normalizzaTesto(mentore.nome)
+      )
     };
     return hackathonRequest;
   }
@@ -90,13 +94,14 @@ export class HackathonCreate {
     this.error.set('Errore nella creazione dell\'hackathon.');
   }
 
-  // Aggiunge un elemento vuoto che l'utente potrà editare nell'input
-  aggiungiMentore() {
-    this.nomeMentori.push('');
+  aggiungiMentore(): void {
+    this.nomeMentori.push({
+      id: this.prossimoMentoreId++,
+      nome: ''
+    });
   }
 
-  // Rimuove l'elemento alla posizione indicata
-  rimuoviMentore(index: number) {
+  rimuoviMentore(index: number): void {
     this.nomeMentori.splice(index, 1);
   }
 
@@ -160,20 +165,24 @@ export class HackathonCreate {
     return !valore || valore.trim().length === 0;
   }
   get mentoriDuplicati(): boolean {
-    const mentoriNormalizzati = this.nomeMentori
-      .map(mentore => mentore.trim())
-      .filter(mentore => mentore.length > 0);
+  const mentoriNormalizzati = this.nomeMentori
+    .map(mentore => mentore.nome.trim())
+    .filter(nome => nome.length > 0);
 
-    return new Set(mentoriNormalizzati).size !== mentoriNormalizzati.length;
-  }
+  return new Set(mentoriNormalizzati).size !== mentoriNormalizzati.length;
+}
 
   get giudiceTraMentori(): boolean {
-    const giudice = this.nomeGiudice.trim().toLowerCase();
+    const giudice = this.nomeGiudice.trim();
     if (!giudice) {
       return false;
     }
     return this.nomeMentori
-      .map(mentore => mentore.trim())
+      .map(mentore => mentore.nome.trim())
       .includes(giudice);
+  }
+
+  get mentoreVuoto(): boolean {
+    return this.nomeMentori.some(mentore => this.isBlank(mentore.nome));
   }
 }

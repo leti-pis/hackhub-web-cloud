@@ -19,8 +19,6 @@ token = signal<string | null>(localStorage.getItem('token'));
 nomeUtente = signal<string | null>(localStorage.getItem('nomeUtente'));
 tipo = signal<string | null>(localStorage.getItem('tipo'));
 
-// computed permette di verificare se l'utente è loggato in base alla presenza del token
-// è una proprietà derivata che si aggiorna automaticamente quando il valore del token cambia
 isLoggedIn = computed(() => this.token() !== null);
 
 login(request: LoginRequest): Observable<AuthResponse> {
@@ -41,7 +39,6 @@ logout(): void {
   this.tipo.set(null);
 }
 
-// Salva i dati della sessione nel localStorage e negli stati signal
 salvaSessione(response: AuthResponse): void {
   localStorage.setItem('token', response.token);
   localStorage.setItem('nomeUtente', response.nomeUtente);

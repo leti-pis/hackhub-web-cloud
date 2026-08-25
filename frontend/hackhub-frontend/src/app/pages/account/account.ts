@@ -1,17 +1,17 @@
 import { Component, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { TeamService } from '../../services/team/team-service';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth/auth-service';
 
 @Component({
   selector: 'app-account',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './account.html',
   styleUrl: './account.scss',
 })
 export class Account {
-  constructor(private teamService: TeamService, private authService: AuthService) {
+  constructor(private teamService: TeamService, private authService: AuthService, private router: Router) {
   }
 
   nomeUtente = localStorage.getItem('nomeUtente');
@@ -40,6 +40,7 @@ export class Account {
 
   logout(): void {
     this.authService.logout(); 
+    this.router.navigate(['/login']);
   }
 
 

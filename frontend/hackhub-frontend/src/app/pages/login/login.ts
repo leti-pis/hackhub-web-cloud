@@ -18,14 +18,13 @@ export class Login {
 
   nomeUtente = '';
   password = '';
-  //signal notifica angular che il valore è cambiato e aggiorna la view
   erroreLogin = signal('');
 
   loginInCorso = signal(false);
 
   accedi() : void {
-    this.erroreLogin.set(''); // Reset dell'errore prima di effettuare la richiesta
-    this.loginInCorso.set(true); // Imposta lo stato di caricamento a true
+    this.erroreLogin.set('');
+    this.loginInCorso.set(true);
     const loginRequest: LoginRequest = {
       nomeUtente: this.nomeUtente,
       password: this.password

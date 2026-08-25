@@ -33,5 +33,9 @@ export const routes: Routes = [
         path: 'account',
         component: Account,
         canActivate: [authGuard]
+    },
+    {
+        path: '**',
+        redirectTo: ''
     }
 ];

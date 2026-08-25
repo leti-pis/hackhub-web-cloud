@@ -1,45 +1,45 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
-import { HakathonCard } from "../hakathon-card/hakathon-card";
-import { Hackathon } from '../../models/hackathon.model';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Hackathon } from '../../models/hackathon.model';
 import { HackathonService } from '../../services/hackathon-service/hackathon-service';
+import { StatoHackathon } from '../../types/statoHackathon.type';
+import { HackathonCard } from '../hackathon-card/hackathon-card';
+
+type FiltroHackathon = StatoHackathon | 'TUTTI_ATTIVI';
 
 @Component({
   selector: 'app-hackathon-list',
-  imports: [FormsModule, HakathonCard],
+  imports: [FormsModule, HackathonCard],
   templateUrl: './hackathon-list.html',
   styleUrl: './hackathon-list.scss',
 })
 export class HackathonList implements OnInit {
+  readonly filtroSelezionato = signal<FiltroHackathon>('TUTTI_ATTIVI');
+  readonly hackathons = signal<Hackathon[]>([]);
 
-  constructor(private hackathonService: HackathonService) {
-  }
+  readonly hackathonsVisibili = computed(() => {
+    if (this.filtroSelezionato() === 'TUTTI_ATTIVI') {
+      return this.hackathons().filter(
+        hackathon => hackathon.stato !== 'CONCLUSO'
+      );
+    }
 
-  filtroSelezionato = signal<string>('TUTTI_ATTIVI');
-  hackathons = signal<Hackathon[]>([]);
+    return this.hackathons().filter(
+      hackathon => hackathon.stato === this.filtroSelezionato()
+    );
+  });
 
-  ngOnInit() {
+  constructor(private hackathonService: HackathonService) {}
+
+  ngOnInit(): void {
     this.hackathonService.getHackathonList().subscribe(
       {
         next: (h) => {
           this.hackathons.set(h);
         },
         error: (errore) => {
-          console.error("Errore nella ricerca degli hackathon", errore);
+          console.error('Errore nella ricerca degli hackathon', errore);
         }
       });
   }
-
-// computed è un metodo che permette di creare una proprietà calcolata, che si aggiorna automaticamente quando le proprietà da cui dipende cambiano
-hackathonsVisibili = computed(() => {
-  if(this.filtroSelezionato() === 'TUTTI_ATTIVI') {
-    return this.hackathons().filter(
-      hackathon => hackathon.stato !== 'CONCLUSO'
-    );
-  }
-  return this.hackathons().filter(
-    hackathon => hackathon.stato === this.filtroSelezionato()
-  );
-});
-
 }

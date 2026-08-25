@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
-//Intercetta le richieste HTTP e può aggiungere cose (come l'header di autorizzazione con il token JWT se presente nel localStorage)
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   
   const authService = inject(AuthService);
