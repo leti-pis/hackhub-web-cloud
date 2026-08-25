@@ -1,11 +1,14 @@
-import { ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { HackathonService } from '../../services/hackathon-service/hackathonService';
+import { HackathonService } from '../../services/hackathon-service/hackathon-service';
 import { Hackathon } from '../../models/hackathon.model';
 import { NgClass } from '@angular/common';
 import { TeamService } from '../../services/team/team-service';
-import { Observable, of, forkJoin } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { of, Observable, finalize, throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
+import { IscrizioneTeamRequest } from '../../models/iscrizione-team-request.model';
+import { AuthService } from '../../services/auth/auth-service';
 
 @Component({
   selector: 'app-hackathon-detail',
@@ -14,42 +17,95 @@ import { map, catchError } from 'rxjs/operators';
   styleUrl: './hackathon-detail.scss',
 })
 export class HackathonDetail implements OnInit {
-  constructor(private route: ActivatedRoute, private hackathonService: HackathonService, private cdr: ChangeDetectorRef, private teamService: TeamService) {
+  constructor(private route: ActivatedRoute, private hackathonService: HackathonService, private teamService: TeamService, private authService: AuthService) {
   }
 
   id: string | null = null;
-  
-  //= hackathon: Hackathon | undefined;
-  hackathon?: Hackathon;
+  hackathon = signal<Hackathon | undefined>(undefined);
 
   erroreIscrizione = signal('');
   successoIscrizione = signal('');
+  erroreCaricamento = signal('');
+
+  iscrizioneInCorso = signal(false);
+  iscritto = signal(false);
+
+  get isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
+  }
 
   ngOnInit(): void {
-    this.id = this.route.snapshot.paramMap.get('id');
-    if (this.id === null){
+    this.id = this.getHackathonId();
+    if (this.id === null) {
       console.error('ID hackathon non presente nella rotta');
       return;
     }
-    this.hackathonService.getHackathonById(this.id).subscribe(
-      {
-        next: (h) => {
-          console.log('Hackathon ricevuto:', h);
-          this.hackathon = h;
-          //Avverte Angular che è cambiato qualcosa che il template usa e di ricontrollare questo componente
-          this.cdr.markForCheck();
-        },
-      error: (errore) => {
-        console.error("Errore nella ricerca dell'hackathon", errore);
-      }
+    this.caricaHackathon(this.id);
+  }
+
+  private getHackathonId(): string | null {
+    return this.route.snapshot.paramMap.get('id');
+  }
+
+  private verificaIscrizione(hackathon: Hackathon): Observable<{ hackathon: Hackathon; iscritto: boolean }> {
+    const nomeUtente = localStorage.getItem('nomeUtente');
+    // Se l'utente non è loggato, restituisci un Observable che emette un oggetto con hackathon e iscritto impostato a false.
+    if (!nomeUtente) {
+      //return of è un operatore di RxJS che crea un Observable che emette un singolo valore e poi completa.
+      return of({
+        hackathon,
+        iscritto: false
       });
     }
+    // Se l'utente è loggato, chiama il servizio TeamService per ottenere le iscrizioni del team e verifica se l'hackathon corrente è tra le iscrizioni.
+    return this.teamService.getIscrizioniTeam().pipe(
+      map((iscrizioni) => ({
+        hackathon,
+        iscritto: iscrizioni.includes(hackathon.nome)
+      })),
+      catchError((errore: HttpErrorResponse) => {
+        if (errore.status === 404) {
+          return of({
+            hackathon,
+            iscritto: false
+          });
+        }
+        return throwError(() => errore);
+      })
+    );
+  }
 
-    formattaStato(stato: string): string {
+  private caricaHackathon(id: string): void {
+    this.hackathonService.getHackathonById(id).pipe(
+      // switchMap viene utilizzato per trasformare l'Observable emesso da getHackathonById in un nuovo Observable che verifica
+      //  se l'utente è iscritto all'hackathon. In pratica, prende l'hackathon ottenuto e lo passa alla funzione 
+      // verificaIscrizione, che restituisce un nuovo Observable con le informazioni sull'iscrizione.
+      switchMap((h) => {
+        this.hackathon.set(h);
+        return this.verificaIscrizione(h);
+      })
+      // subscribe viene utilizzato per iscriversi all'Observable risultante. Quando l'Observable emette un valore,
+      // la funzione next viene chiamata con l'oggetto che contiene le informazioni sull'hackathon e se l'utente è iscritto.
+    ).subscribe({
+      // le parentesi attorno a { iscritto } indicano che stiamo usando la destrutturazione dell'oggetto restituito 
+      // dall'Observable. In questo caso, l'oggetto ha due proprietà: hackathon e iscritto. Stiamo estraendo solo la 
+      // proprietà iscritto e la stiamo usando per aggiornare il segnale iscritto.
+      next: ({ iscritto }) => {
+        this.iscritto.set(iscritto);
+      },
+      error: (error) => {
+        console.error('Errore durante il recupero dei dettagli dell\'hackathon:', error);
+        this.erroreCaricamento.set('Errore durante il recupero dei dettagli dell\'hackathon.');
+      }
+    }
+    )
+  }
+
+  formattaStato(stato: string): string {
     return stato
-    .toLowerCase()
-    .replaceAll('_', ' ')
-    .replace(/^./, carattere => carattere.toUpperCase());
+      .toLowerCase()
+      .replaceAll('_', ' ')
+      .replace(/^./, carattere => carattere.toUpperCase());
   }
 
   formattaData(data: string): string {
@@ -57,7 +113,7 @@ export class HackathonDetail implements OnInit {
   }
 
   classeStato(stato: string): string {
-    switch(stato) {
+    switch (stato) {
       case 'ISCRIZIONI_APERTE': return 'text-bg-success';
       case 'ISCRIZIONI_CHIUSE': return 'text-bg-secondary';
       case 'IN_CORSO': return 'text-bg-primary';
@@ -71,72 +127,53 @@ export class HackathonDetail implements OnInit {
   }
 
   iscriviti(): void {
+    this.preparaIscrizione();
+    this.hackathonService.postTeamRegistration(this.creaRichiestaIscrizione())
+      // finalize viene utilizzato per eseguire un'azione al termine dell'osservabile, 
+      // indipendentemente dal fatto che sia stato completato con successo o con errore. 
+      // In questo caso, viene utilizzato per impostare iscrizioneInCorso a false al termine della richiesta.
+      .pipe(
+        switchMap(() => {
+          return this.hackathonService.getHackathonById(this.hackathon()!.id);
+        }),
+        finalize(() => {
+          this.iscrizioneInCorso.set(false);
+        })
+      ).subscribe({
+        next: (h) => {
+          this.hackathon.set(h);
+          this.iscritto.set(true);
+          this.successoIscrizione.set('Iscrizione avvenuta con successo!');
+        },
+        error: (errore) => {
+          this.gestisciErroreIscrizione(errore);
+        }
+      });
+  }
+
+  private preparaIscrizione(): void {
+    this.iscrizioneInCorso.set(true);
     this.erroreIscrizione.set(''); // Reset dell'errore prima di effettuare la richiesta
     this.successoIscrizione.set(''); // Reset del successo prima di effettuare la richiesta
-    this.hackathonService.postTeamRegistration({nomeUtente: localStorage.getItem('nomeUtente') || '', nomeHackathon: this.hackathon!.nome}).subscribe({
-      next: (response) => {
-        this.successoIscrizione.set('Iscrizione avvenuta con successo!');
-      },
-      error: (errore) => { 
-        forkJoin({
-          team: this.teamService.getTeam(),
-        }).subscribe({
-          next: ({ team}) => {
-            const nomeUtente = localStorage.getItem('nomeUtente');
-            const hasTeam = team !== null && team !== undefined;
-            const isLeader = team?.nomeLeader === nomeUtente;
-            const isAlreadyRegistered = this.isAlreadyRegistered();
-            const numeroMembri = team?.nomiMembri.length || 0;
-            if (!hasTeam) {
-              this.erroreIscrizione.set('Devi essere in un team per poterti iscrivere a un hackathon');
-              return;
-            }
-            if (numeroMembri < this.hackathon!.teamMin || numeroMembri > this.hackathon!.teamMax) {
-              this.erroreIscrizione.set(`Il tuo team deve avere tra ${this.hackathon!.teamMin} e ${this.hackathon!.teamMax} membri per potersi iscrivere a questo hackathon`);
-              return;
-            }
-            if (!isLeader) {
-              this.erroreIscrizione.set('Solo il leader del team può iscrivere il team a un hackathon');
-              return;
-            }
-            if (isAlreadyRegistered) {
-              this.erroreIscrizione.set('Il tuo team è già iscritto a questo hackathon');
-              return;
-            }
-            // Se non ci sono errori specifici, mostra l'errore generico
-            this.erroreIscrizione.set('Errore durante l\'iscrizione: ' + errore.message);
-          },
-          error: (errore) => {
-            console.error('Errore durante la verifica del team o delle iscrizioni:', errore);
-            this.erroreIscrizione.set('Errore durante la verifica del team o delle iscrizioni: ' + errore.message);
-          }
-        });
-      }
-    });
   }
 
-  isLoggedIn(): boolean {
-    return localStorage.getItem('nomeUtente') !== null;
+  private creaRichiestaIscrizione(): IscrizioneTeamRequest {
+    return {
+      nomeUtente: localStorage.getItem('nomeUtente') || '',
+      nomeHackathon: this.hackathon()!.nome
+    };
   }
 
-  //TODO
-  isAlreadyRegistered(): Observable<boolean> {
-    // Controlla se l'utente è già registrato all'hackathon
-    const nomeUtente = localStorage.getItem('nomeUtente');
-    if (!nomeUtente || !this.hackathon) {
-      return of(false);
+  // HttpErrorResponse è una classe di Angular che rappresenta un errore HTTP. Rispetto a any, HttpErrorResponse 
+  // fornisce proprietà specifiche per gli errori HTTP, come status, statusText, error, ecc.
+  private gestisciErroreIscrizione(errore: HttpErrorResponse) {
+    if (errore.error?.message) {
+      this.erroreIscrizione.set(errore.error.message);
+      return;
     }
-    return this.teamService.getIscrizioniTeam().pipe(
-      map(iscrizioni => {
-        if (iscrizioni.includes(this.hackathon!.nome)) {
-          return true;
-        }
-        return false;
-      }),
-      catchError(errore => {
-        console.error('Errore nella verifica delle iscrizioni del team', errore);
-        return of(false);
-      })
-    );  
+    this.erroreIscrizione.set('Errore durante l\'iscrizione. Riprova più tardi.');
   }
+
+
+  
 }

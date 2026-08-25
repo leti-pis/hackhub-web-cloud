@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth/auth-service';
 
 @Component({
   selector: 'app-navbar',
@@ -8,10 +9,11 @@ import { RouterLink } from '@angular/router';
   styleUrl: './navbar.scss',
 })
 export class Navbar {
+  constructor(private authService: AuthService) {
+  }
 
-  isLoggedIn(): boolean {
-    const token = localStorage.getItem('token');
-    return token !== null && token !== undefined;
+  get isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
   }
 
 }

@@ -5,6 +5,7 @@ import { HackathonCreate } from './pages/hackathon-create/hackathon-create';
 import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
 import { Account } from './pages/account/account';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
     {
@@ -17,7 +18,8 @@ export const routes: Routes = [
     },
     {
         path: 'hackathon/create',
-        component: HackathonCreate
+        component: HackathonCreate,
+        canActivate: [authGuard]
     },
     {
         path: 'login',
@@ -29,6 +31,7 @@ export const routes: Routes = [
     },
     {
         path: 'account',
-        component: Account
+        component: Account,
+        canActivate: [authGuard]
     }
 ];

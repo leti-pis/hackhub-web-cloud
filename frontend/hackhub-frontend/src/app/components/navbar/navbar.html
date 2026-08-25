@@ -20,7 +20,7 @@
 
       <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
 
-        @if (!isLoggedIn()) {
+        @if (!isLoggedIn) {
           <li class="nav-item">
             <a
               class="btn btn-outline-primary"
@@ -30,7 +30,7 @@
           </li>
         }
 
-        @if (isLoggedIn()) {
+        @if (isLoggedIn) {
           <li class="nav-item">
             <a
               class="btn btn-primary"

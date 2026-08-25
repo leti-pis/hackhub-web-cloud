@@ -22,44 +22,44 @@
     <div class="mb-4">
       <small class="text-body-secondary">Team</small>
 
-      @if (nomeTeam) {
-        <p class="fw-semibold fs-5 mb-1">
-          {{ nomeTeam }}
-        </p>
+      @if (caricamentoTeam()) {
+      <p class="text-body-secondary mb-0">
+        Caricamento team...
+      </p>
+      } @else if (nomeTeam()) {
+      <p class="fw-semibold fs-5 mb-1">
+        {{ nomeTeam() }}
+      </p>
 
-        <span class="badge text-bg-primary">
-          {{ ruolo }}
-        </span>
+      <span class="badge text-bg-primary">
+        {{ ruolo() }}
+      </span>
       } @else {
-        <p class="text-body-secondary mb-0">
-          Non fai parte di un team
-        </p>
+      <p class="text-body-secondary mb-0">
+        Non fai parte di un team
+      </p>
       }
     </div>
 
-    @if (nomeTeam) {
-      <div class="mb-4">
-        <h5 class="mb-3">Membri del team</h5>
+    @if (nomeTeam()) {
+    <div class="mb-4">
+      <h5 class="mb-3">Membri del team</h5>
 
-        <ul class="list-group list-group-flush">
-          @for (nome of nomiMembri; track nome) {
-            <li class="list-group-item px-0 d-flex align-items-center">
-              <span class="fw-semibold">
-                {{ nome }}
-              </span>
-            </li>
-          }
-        </ul>
-      </div>
+      <ul class="list-group list-group-flush">
+        @for (nome of nomiMembri(); track nome) {
+        <li class="list-group-item px-0 d-flex align-items-center">
+          <span class="fw-semibold">
+            {{ nome }}
+          </span>
+        </li>
+        }
+      </ul>
+    </div>
     }
 
     <hr>
 
-    <button
-      class="btn btn-outline-danger"
-      type="button"
-      (click)="logout()"
-      [routerLink]="['/login']">
+    <button class="btn btn-outline-danger" type="button" (click)="logout()" [routerLink]="['/login']">
       Esci
     </button>
 

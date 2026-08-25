@@ -9,11 +9,10 @@ import { IscrizioneTeamRequest } from '../../models/iscrizione-team-request.mode
 @Injectable({
   //Significa che Angular crea un'unica istanza del service, disponibile in 
   // tutta l'app
-  //Non è un singleton perchè si possono creare altre istanze
   providedIn: 'root',
 })
 export class HackathonService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   apiUrl = "/api/hackathon";
   getHackathonById(id: string) {
@@ -22,15 +21,21 @@ export class HackathonService {
     return this.http.get<Hackathon>(`${this.apiUrl}/${id}`);
   }
 
+  getHackathonList() {
+    return this.http.get<Hackathon[]>(this.apiUrl);
+  }
+
   postHackathon(hackathon: HackathonRequest) {
     return this.http.post<Hackathon>(this.apiUrl, hackathon);
   }
 
   postTeamRegistration(request: IscrizioneTeamRequest) {
-    return this.http.post(`${this.apiUrl}/${request.nomeHackathon}/iscrizioni`, request);
+    const nomeHackathon = encodeURIComponent(request.nomeHackathon);
+    return this.http.post(`${this.apiUrl}/${nomeHackathon}/iscrizioni`, request);
   }
 
   getIscrizioniUtente(nomeHackathon: string) {
-    return this.http.get<Hackathon[]>(`${this.apiUrl}/${nomeHackathon}/iscrizioni`, );
+    const nomeHackathonEncoded = encodeURIComponent(nomeHackathon);
+    return this.http.get<Hackathon[]>(`${this.apiUrl}/${nomeHackathonEncoded}/iscrizioni`,);
   }
 }

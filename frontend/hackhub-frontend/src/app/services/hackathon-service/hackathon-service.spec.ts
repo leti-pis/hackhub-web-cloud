@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { HackathonService } from './hackathonService';
+import { HackathonService } from './hackathon-service';
 
 describe('Hackathon', () => {
   let service: HackathonService;

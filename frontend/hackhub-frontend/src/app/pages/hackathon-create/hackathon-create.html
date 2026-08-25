@@ -1,54 +1,78 @@
 <form (ngSubmit)="creaHackathon()" class="container py-3" #hackathonForm="ngForm">
   <h3 class="mb-3">Crea un nuovo hackathon</h3>
-  <!-- NOME + LUOGO -->
+
   <div class="row g-3">
     <div class="col-md-6">
       <div class="form-floating">
         <input type="text" class="form-control" [(ngModel)]="nome" name="nome" #nomeCtrl="ngModel" required
-          minlength="3" [class.is-invalid]="nomeCtrl.invalid && nomeCtrl.touched" id="nome" placeholder="Nome">
+          minlength="3" [class.is-invalid]="(nomeCtrl.invalid || isBlank(nome)) && nomeCtrl.touched" id="nome"
+          placeholder="Nome">
+
         <label for="nome">Nome</label>
+
         @if (nomeCtrl.errors?.['required']) {
         <div class="invalid-feedback">
           Il nome è obbligatorio
         </div>
         }
+
         @if (nomeCtrl.errors?.['minlength']) {
         <div class="invalid-feedback">
           Il nome deve contenere almeno 3 caratteri
         </div>
         }
+
+        @if (isBlank(nome) && nomeCtrl.touched) {
+        <div class="invalid-feedback">
+          Il nome non può contenere solo spazi
+        </div>
+        }
       </div>
     </div>
+
     <div class="col-md-6">
       <div class="form-floating">
         <input type="text" class="form-control" [(ngModel)]="luogo" name="luogo" #luogoCtrl="ngModel" required
-          minlength="3" [class.is-invalid]="luogoCtrl.invalid && luogoCtrl.touched" id="luogo" placeholder="Luogo">
+          minlength="3" [class.is-invalid]="(luogoCtrl.invalid || isBlank(luogo)) && luogoCtrl.touched" id="luogo"
+          placeholder="Luogo">
+
         <label for="luogo">Luogo</label>
+
         @if (luogoCtrl.errors?.['required']) {
         <div class="invalid-feedback">
           Il luogo è obbligatorio
         </div>
         }
+
         @if (luogoCtrl.errors?.['minlength']) {
         <div class="invalid-feedback">
           Il luogo deve contenere almeno 3 caratteri
         </div>
         }
+
+        @if (isBlank(luogo) && luogoCtrl.touched) {
+        <div class="invalid-feedback">
+          Il luogo non può contenere solo spazi
+        </div>
+        }
       </div>
     </div>
   </div>
-  <!-- PREMIO + DATE -->
+
   <div class="row g-3 mt-1">
     <div class="col-md-4">
       <div class="form-floating">
         <input type="number" class="form-control" [(ngModel)]="premio" name="premio" #premioCtrl="ngModel" required
           min="1" [class.is-invalid]="premioCtrl.invalid && premioCtrl.touched" id="premio" placeholder="Premio">
+
         <label for="premio">Premio €</label>
+
         @if (premioCtrl.errors?.['required']) {
         <div class="invalid-feedback">
           Il premio è obbligatorio
         </div>
         }
+
         @if (premioCtrl.errors?.['min']) {
         <div class="invalid-feedback">
           Il premio deve essere positivo
@@ -56,65 +80,73 @@
         }
       </div>
     </div>
+
     <div class="col-md-4">
       <div class="form-floating">
         <input type="date" class="form-control" [(ngModel)]="dataInizio" name="dataInizio" #dataInizioCtrl="ngModel"
-          required [min]="oggi" [class.is-invalid]="dataInizioCtrl.invalid && dataInizioCtrl.touched" id="dataInizio">
+          required [min]="oggi"
+          [class.is-invalid]="(dataInizioCtrl.invalid || dataInizioPassata) && dataInizioCtrl.touched" id="dataInizio">
+
         <label for="dataInizio">Data di inizio</label>
+
         @if (dataInizioCtrl.errors?.['required']) {
         <div class="invalid-feedback">
           La data di inizio è obbligatoria
         </div>
         }
-        @if (dataInizioCtrl.errors?.['min']) {
+
+        @if (dataInizioPassata) {
         <div class="invalid-feedback">
           La data di inizio non può essere precedente a oggi
         </div>
         }
       </div>
     </div>
+
     <div class="col-md-4">
       <div class="form-floating">
         <input type="date" class="form-control" [(ngModel)]="dataFine" name="dataFine" #dataFineCtrl="ngModel" required
-          [min]="dataInizio || oggi" [class.is-invalid]="
-            (dataFineCtrl.invalid ||
-            (dataInizio && dataFine && dataFine < dataInizio))
-            && dataFineCtrl.touched
-          " id="dataFine">
+          [min]="dataInizio || oggi"
+          [class.is-invalid]="(dataFineCtrl.invalid || dateNonValide) && dataFineCtrl.touched" id="dataFine">
+
         <label for="dataFine">Data di conclusione</label>
+
         @if (dataFineCtrl.errors?.['required']) {
         <div class="invalid-feedback">
           La data di conclusione è obbligatoria
         </div>
         }
-        @if (
-        dataInizio &&
-        dataFine &&
-        dataFine < dataInizio ) { <div class="invalid-feedback">
+
+        @if (dateNonValide) {
+        <div class="invalid-feedback">
           La data di conclusione non può precedere la data di inizio
+        </div>
+        }
       </div>
-      }
     </div>
   </div>
-  </div>
-  <!-- DIMENSIONI TEAM + ISCRIZIONI -->
+
   <div class="row g-3 mt-1">
     <div class="col-md-4">
       <div class="form-floating">
         <input type="number" class="form-control" [(ngModel)]="teamMin" name="teamMin" #teamMinCtrl="ngModel" required
           min="3" max="6" [class.is-invalid]="teamMinCtrl.invalid && teamMinCtrl.touched" id="teamMin"
           placeholder="Minimo membri">
+
         <label for="teamMin">Membri minimi</label>
+
         @if (teamMinCtrl.errors?.['required']) {
         <div class="invalid-feedback">
           Il numero minimo di membri è obbligatorio
         </div>
         }
+
         @if (teamMinCtrl.errors?.['min']) {
         <div class="invalid-feedback">
           Il team deve avere almeno 3 membri
         </div>
         }
+
         @if (teamMinCtrl.errors?.['max']) {
         <div class="invalid-feedback">
           Il numero minimo non può superare 6
@@ -122,85 +154,90 @@
         }
       </div>
     </div>
+
     <div class="col-md-4">
       <div class="form-floating">
         <input type="number" class="form-control" [(ngModel)]="teamMax" name="teamMax" #teamMaxCtrl="ngModel" required
-          min="3" max="6" [class.is-invalid]="
-            (teamMaxCtrl.invalid ||
-            (teamMin != null && teamMax != null && teamMax < teamMin))
-            && teamMaxCtrl.touched
-          " id="teamMax" placeholder="Massimo membri">
+          min="3" max="6" [class.is-invalid]="(teamMaxCtrl.invalid || teamMaxMinNonValidi) && teamMaxCtrl.touched"
+          id="teamMax" placeholder="Massimo membri">
+
         <label for="teamMax">Membri massimi</label>
+
         @if (teamMaxCtrl.errors?.['required']) {
         <div class="invalid-feedback">
           Il numero massimo di membri è obbligatorio
         </div>
         }
+
         @if (teamMaxCtrl.errors?.['min']) {
         <div class="invalid-feedback">
           Il numero massimo deve essere almeno 3
         </div>
         }
+
         @if (teamMaxCtrl.errors?.['max']) {
         <div class="invalid-feedback">
           Il numero massimo non può superare 6
         </div>
         }
-        @if (
-        teamMin != null &&
-        teamMax != null &&
-        teamMax < teamMin ) { <div class="invalid-feedback">
+
+        @if (teamMaxMinNonValidi) {
+        <div class="invalid-feedback">
           Il numero massimo non può essere inferiore al minimo
+        </div>
+        }
       </div>
-      }
+    </div>
+
+    <div class="col-md-4">
+      <div class="form-floating">
+        <input type="number" class="form-control" [(ngModel)]="maxIscrizioni" name="maxIscrizioni"
+          #maxIscrizioniCtrl="ngModel" required min="1"
+          [class.is-invalid]="maxIscrizioniCtrl.invalid && maxIscrizioniCtrl.touched" id="maxIscrizioni"
+          placeholder="Massimo iscrizioni">
+
+        <label for="maxIscrizioni">Massimo iscrizioni</label>
+
+        @if (maxIscrizioniCtrl.errors?.['required']) {
+        <div class="invalid-feedback">
+          Il numero massimo di iscrizioni è obbligatorio
+        </div>
+        }
+
+        @if (maxIscrizioniCtrl.errors?.['min']) {
+        <div class="invalid-feedback">
+          Deve essere consentita almeno un'iscrizione
+        </div>
+        }
+      </div>
     </div>
   </div>
-  <div class="col-md-4">
-    <div class="form-floating">
-      <input type="number" class="form-control" [(ngModel)]="maxIscrizioni" name="maxIscrizioni"
-        #maxIscrizioniCtrl="ngModel" required min="1" [class.is-invalid]="
-            maxIscrizioniCtrl.invalid &&
-            maxIscrizioniCtrl.touched
-          " id="maxIscrizioni" placeholder="Massimo iscrizioni">
-      <label for="maxIscrizioni">Massimo iscrizioni</label>
-      @if (maxIscrizioniCtrl.errors?.['required']) {
-      <div class="invalid-feedback">
-        Il numero massimo di iscrizioni è obbligatorio
-      </div>
-      }
-      @if (maxIscrizioniCtrl.errors?.['min']) {
-      <div class="invalid-feedback">
-        Deve essere consentita almeno un'iscrizione
-      </div>
-      }
-    </div>
-  </div>
-  </div>
-  <!-- SCADENZA + GIUDICE -->
+
   <div class="row g-3 mt-1">
     <div class="col-md-6">
       <div class="form-floating">
         <input type="datetime-local" class="form-control" [(ngModel)]="scadenzaIscrizioni" name="scadenzaIscrizioni"
           #scadenzaCtrl="ngModel" required [min]="oraAttuale" [class.is-invalid]="
-            (
-              scadenzaCtrl.invalid ||
-              scadenzaSuccessivaInizio
-            )
+            (scadenzaCtrl.invalid || scadenzaPassata || scadenzaSuccessivaInizio)
             && scadenzaCtrl.touched
           " id="scadenzaIscrizioni">
+
         <label for="scadenzaIscrizioni">
           Scadenza iscrizioni
         </label>
+
         @if (scadenzaCtrl.errors?.['required']) {
         <div class="invalid-feedback">
           La scadenza delle iscrizioni è obbligatoria
         </div>
         }
-        @if (scadenzaCtrl.errors?.['min']) {
+
+        @if (scadenzaPassata) {
         <div class="invalid-feedback">
           La scadenza delle iscrizioni deve essere futura
         </div>
         }
+
         @if (scadenzaSuccessivaInizio) {
         <div class="invalid-feedback">
           Le iscrizioni devono chiudersi prima dell'inizio dell'hackathon
@@ -208,41 +245,75 @@
         }
       </div>
     </div>
+
     <div class="col-md-6">
       <div class="form-floating">
         <input type="text" class="form-control" [(ngModel)]="nomeGiudice" name="nomeGiudice" #giudiceCtrl="ngModel"
-          required [class.is-invalid]="giudiceCtrl.invalid && giudiceCtrl.touched" id="nomeGiudice"
-          placeholder="Username giudice">
+          required [class.is-invalid]="(giudiceCtrl.invalid || isBlank(nomeGiudice)) && giudiceCtrl.touched"
+          id="nomeGiudice" placeholder="Username giudice">
+
         <label for="nomeGiudice">
           Nome utente del giudice
         </label>
+
+        @if (giudiceCtrl.errors?.['required']) {
         <div class="invalid-feedback">
           Il giudice è obbligatorio
         </div>
+        }
+        @if (giudiceTraMentori) {
+        <div class="text-danger small mb-2">
+          Il giudice non può essere anche un mentore
+        </div>
+        }
+
+        @if (isBlank(nomeGiudice) && giudiceCtrl.touched) {
+        <div class="invalid-feedback">
+          Il nome utente del giudice non può contenere solo spazi
+        </div>
+        }
       </div>
     </div>
   </div>
-  <!-- MENTORI -->
+
   <hr class="my-4">
+
   <div class="mb-4">
     <div class="d-flex align-items-center gap-2 mb-2">
       <h6 class="mb-0">Mentori</h6>
+
       <button type="button" class="btn btn-primary btn-sm fw-bold fs-6 px-2 py-0" (click)="aggiungiMentore()">
         +
       </button>
     </div>
+
     @for (mentore of nomeMentori; track $index) {
     <div class="row g-2 mb-2">
       <div class="col">
         <input type="text" class="form-control" [name]="'nomeMentore' + $index" [(ngModel)]="nomeMentori[$index]"
           #mentoreCtrl="ngModel" required [class.is-invalid]="
-              mentoreCtrl.invalid &&
-              mentoreCtrl.touched
+              (mentoreCtrl.invalid || isBlank(nomeMentori[$index]))
+              && mentoreCtrl.touched
             " placeholder="Nome utente del mentore">
+
+        @if (mentoreCtrl.errors?.['required']) {
         <div class="invalid-feedback">
           Inserisci il nome utente del mentore
         </div>
+        }
+
+        @if (isBlank(nomeMentori[$index]) && mentoreCtrl.touched) {
+        <div class="invalid-feedback">
+          Il nome utente del mentore non può contenere solo spazi
+        </div>
+        }
+        @if (mentoriDuplicati) {
+        <div class="text-danger small mb-2">
+          Non puoi inserire lo stesso mentore più volte
+        </div>
+        }
       </div>
+
       <div class="col-auto">
         <button type="button" class="btn btn-outline-danger" (click)="rimuoviMentore($index)">
           Rimuovi
@@ -255,37 +326,69 @@
     </div>
     }
   </div>
-  <!-- REGOLAMENTO -->
+
   <hr>
+
   <div class="row g-3 mt-1">
     <div class="col-12">
       <div class="form-floating">
         <textarea class="form-control" [(ngModel)]="regolamento" name="regolamento" #regolamentoCtrl="ngModel" required
           [class.is-invalid]="
-            regolamentoCtrl.invalid &&
-            regolamentoCtrl.touched
+            (regolamentoCtrl.invalid || isBlank(regolamento))
+            && regolamentoCtrl.touched
           " id="regolamento" placeholder="Regolamento completo..." style="height: 140px">
         </textarea>
+
         <label for="regolamento">
           Regolamento
         </label>
+
+        @if (regolamentoCtrl.errors?.['required']) {
         <div class="invalid-feedback">
           Il regolamento è obbligatorio
         </div>
+        }
+
+        @if (isBlank(regolamento) && regolamentoCtrl.touched) {
+        <div class="invalid-feedback">
+          Il regolamento non può contenere solo spazi
+        </div>
+        }
       </div>
     </div>
   </div>
-  <!-- SUBMIT -->
+
+  @if (error()) {
+  <div class="alert alert-danger mt-4" role="alert">
+    {{ error() }}
+  </div>
+  }
+
   <hr>
+
   <div class="d-flex justify-content-end">
     <button type="submit" class="btn btn-primary" [disabled]="
         hackathonForm.invalid ||
         nomeMentori.length === 0 ||
+        isBlank(nome) ||
+        isBlank(luogo) ||
+        isBlank(nomeGiudice) ||
+        isBlank(regolamento) ||
+        nomeMentori.some(mentore => isBlank(mentore)) ||
         teamMaxMinNonValidi ||
         dateNonValide ||
-        scadenzaSuccessivaInizio
+        scadenzaPassata ||
+        scadenzaSuccessivaInizio ||
+        caricamento() ||
+        mentoriDuplicati || 
+        giudiceTraMentori
       ">
+
+      @if (caricamento()) {
+      Creazione...
+      } @else {
       Crea hackathon
+      }
     </button>
   </div>
 </form>

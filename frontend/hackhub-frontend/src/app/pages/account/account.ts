@@ -1,6 +1,8 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TeamService } from '../../services/team/team-service';
+import { finalize } from 'rxjs';
+import { AuthService } from '../../services/auth/auth-service';
 
 @Component({
   selector: 'app-account',
@@ -9,22 +11,26 @@ import { TeamService } from '../../services/team/team-service';
   styleUrl: './account.scss',
 })
 export class Account {
-  constructor(private teamService: TeamService, private changeDetectorRef: ChangeDetectorRef) {
+  constructor(private teamService: TeamService, private authService: AuthService) {
   }
 
-  nomeUtente: string | null = null;
-  nomeTeam: string | null = null;
-  nomiMembri: string[] | null = null;
-  ruolo: string | null = null;
+  nomeUtente = localStorage.getItem('nomeUtente');
+  nomeTeam = signal<string | null>(null);
+  nomiMembri = signal<string[] | null>(null);
+  ruolo = signal<string | null>(null);
+  caricamentoTeam = signal(true);
 
   ngOnInit(): void {
     this.nomeUtente = localStorage.getItem('nomeUtente');
-    this.teamService.getTeam().subscribe({
+    this.teamService.getTeam().pipe(
+      finalize(() => {
+        this.caricamentoTeam.set(false);
+      })
+    ).subscribe({
       next: (teamResponse) => {
-        this.nomeTeam = teamResponse.nomeTeam;
-        this.ruolo = teamResponse.nomeLeader === this.nomeUtente ? 'Leader' : 'Membro';
-        this.nomiMembri = teamResponse.nomiMembri;
-        this.changeDetectorRef.markForCheck();
+        this.nomeTeam.set(teamResponse.nomeTeam);
+        this.ruolo.set(teamResponse.nomeLeader === this.nomeUtente ? 'Leader' : 'Membro');
+        this.nomiMembri.set(teamResponse.nomiMembri);
       },
       error: (error) => {
         console.error('Errore nella richiesta del team:', error);
@@ -33,8 +39,7 @@ export class Account {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('nomeUtente');
+    this.authService.logout(); 
   }
 
 

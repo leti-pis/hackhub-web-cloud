@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HackathonRequest } from '../../models/hackathon-request.model';
-import { HackathonService } from '../../services/hackathon-service/hackathonService';
+import { HackathonService } from '../../services/hackathon-service/hackathon-service';
+import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-hackathon-create',
@@ -11,7 +14,7 @@ import { HackathonService } from '../../services/hackathon-service/hackathonServ
 })
 export class HackathonCreate {
 
-  constructor(private hackathonService: HackathonService) {}
+  constructor(private hackathonService: HackathonService, private router: Router) { }
 
   nome = '';
   luogo = '';
@@ -26,30 +29,65 @@ export class HackathonCreate {
   nomeGiudice = '';
   nomeMentori: string[] = [];
 
+  error = signal<string>('');
+
+  caricamento = signal(false);
+
   creaHackathon() {
-    const hackathonRequest: HackathonRequest = {
-    nome: this.nome,
-    luogo: this.luogo,
-    premio: this.premio,
-    dataInizio: this.dataInizio,
-    dataFine: this.dataFine,
-    teamMin: this.teamMin,
-    teamMax: this.teamMax,
-    maxIscrizioni: this.maxIscrizioni,
-    regolamento: this.regolamento,
-    scadenzaIscrizioni: this.scadenzaIscrizioni,
-    nomeGiudice: this.nomeGiudice,
-    nomeMentori: this.nomeMentori
-  };
-    this.hackathonService.postHackathon(hackathonRequest).subscribe(
+    const hackathonRequest = this.preparazioneCreazione();
+    this.hackathonService.postHackathon(hackathonRequest).pipe(
+      finalize(() => {
+        this.caricamento.set(false);
+      })
+    ).subscribe(
       {
         next: (h) => {
-          console.log('Hackathon creato:', h);
+          this.router.navigate(['/hackathon-card/' + h.id]);
         },
-        error: (errore) => {
-          console.error("Errore nella creazione dell'hackathon", errore);
+        error: (errore: HttpErrorResponse) => {
+          this.gestisciErrore(errore);
         }
       });
+  }
+
+  private preparazioneCreazione(): HackathonRequest {
+    this.error.set('');
+    this.caricamento.set(true);
+    const hackathonRequest: HackathonRequest = {
+      nome: this.normalizzaTesto(this.nome),
+      luogo: this.normalizzaTesto(this.luogo),
+      premio: this.premio,
+      dataInizio: this.dataInizio,
+      dataFine: this.dataFine,
+      teamMin: this.teamMin,
+      teamMax: this.teamMax,
+      maxIscrizioni: this.maxIscrizioni,
+      regolamento: this.normalizzaTesto(this.regolamento),
+      scadenzaIscrizioni: this.scadenzaIscrizioni,
+      nomeGiudice: this.normalizzaTesto(this.nomeGiudice),
+      nomeMentori: this.nomeMentori.map((m) => this.normalizzaTesto(m))
+    };
+    return hackathonRequest;
+  }
+
+  private gestisciErrore(errore: HttpErrorResponse) {
+    if (errore.status === 409 && errore.error?.message) {
+      this.error.set(errore.error.message);
+      return;
+    }
+    if (errore.status === 400 && errore.error?.message) {
+      this.error.set(errore.error.message);
+      return;
+    }
+    if (errore.status === 0) {
+      this.error.set('Impossibile raggiungere il server. Controlla la connessione e riprova.');
+      return;
+    }
+    if (errore.status >= 500) {
+      this.error.set('Errore del server. Riprova più tardi.');
+      return;
+    }
+    this.error.set('Errore nella creazione dell\'hackathon.');
   }
 
   // Aggiunge un elemento vuoto che l'utente potrà editare nell'input
@@ -103,5 +141,39 @@ export class HackathonCreate {
     }
     const inizioHackathon = `${this.dataInizio}T00:00`;
     return this.scadenzaIscrizioni >= inizioHackathon;
+  }
+
+  get dataInizioPassata(): boolean {
+    return !!this.dataInizio && this.dataInizio < this.oggi;
+  }
+
+  get scadenzaPassata(): boolean {
+    return !!this.scadenzaIscrizioni &&
+      this.scadenzaIscrizioni < this.oraAttuale;
+  }
+
+  private normalizzaTesto(valore: string): string {
+    return valore.trim();
+  }
+
+  isBlank(valore: string): boolean {
+    return !valore || valore.trim().length === 0;
+  }
+  get mentoriDuplicati(): boolean {
+    const mentoriNormalizzati = this.nomeMentori
+      .map(mentore => mentore.trim())
+      .filter(mentore => mentore.length > 0);
+
+    return new Set(mentoriNormalizzati).size !== mentoriNormalizzati.length;
+  }
+
+  get giudiceTraMentori(): boolean {
+    const giudice = this.nomeGiudice.trim().toLowerCase();
+    if (!giudice) {
+      return false;
+    }
+    return this.nomeMentori
+      .map(mentore => mentore.trim())
+      .includes(giudice);
   }
 }

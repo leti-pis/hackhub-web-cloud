@@ -14,6 +14,6 @@ export class TeamService {
   }
 
   getIscrizioniTeam() {
-    return this.http.get<String[]>(`${this.apiUrl}/iscrizioni`);
+    return this.http.get<string[]>(`${this.apiUrl}/iscrizioni`);
   }
 }
