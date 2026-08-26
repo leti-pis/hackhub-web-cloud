@@ -14,5 +14,23 @@ services:
     volumes:
       - hackhub_mysql_data:/var/lib/mysql
 
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hackhub-backend
+    env_file:
+      - .env
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+
 volumes:
   hackhub_mysql_data:

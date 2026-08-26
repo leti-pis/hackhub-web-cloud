@@ -97,6 +97,6 @@ public interface RepositoryHackathon extends JpaRepository<Hackathon, String> {
                            \s""")
     List<Hackathon> findHackathonDaValutare(
             @Param("stato") StatoEnum statoEnum,
-            @Param("scadenza") LocalDateTime scadenza
+            @Param("scadenza") LocalDate scadenza
     );
 }

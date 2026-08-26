@@ -12,7 +12,7 @@ import unicam.cs.hackhub.eccezioni.TransizioneNonConsentitaException;
 import unicam.cs.hackhub.repository.RepositoryHackathon;
 import unicam.cs.hackhub.servizi.ServizioNotifiche;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
@@ -77,7 +77,7 @@ public class EventiTemporaliHandler {
      * sottomissioni dei vari hackathon
      */
     private void iniziaValutazione() {
-        List<Hackathon> hackathonDaValutare = repositoryHackathon.findHackathonDaValutare(StatoEnum.IN_CORSO, LocalDateTime.now());
+        List<Hackathon> hackathonDaValutare = repositoryHackathon.findHackathonDaValutare(StatoEnum.IN_CORSO, LocalDate.now());
         for (Hackathon h : hackathonDaValutare) {
             try {
                 h.avviaValutazione();
