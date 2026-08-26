@@ -91,7 +91,7 @@ export class HackathonCreate {
       this.error.set('Errore del server. Riprova più tardi.');
       return;
     }
-    this.error.set('Errore nella creazione dell\'hackathon.');
+    this.error.set('Errore nella creazione dell\'hackathon');
   }
 
   aggiungiMentore(): void {

@@ -31,9 +31,6 @@ export class Account {
         this.nomeTeam.set(teamResponse.nomeTeam);
         this.ruolo.set(teamResponse.nomeLeader === this.nomeUtente ? 'Leader' : 'Membro');
         this.nomiMembri.set(teamResponse.nomiMembri);
-      },
-      error: (error) => {
-        console.error('Errore nella richiesta del team:', error);
       }
     });
   }

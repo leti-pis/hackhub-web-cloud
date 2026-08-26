@@ -47,7 +47,6 @@ export class HackathonDetail implements OnInit {
   ngOnInit(): void {
     this.id = this.getHackathonId();
     if (this.id === null) {
-      console.error('ID hackathon non presente nella rotta');
       return;
     }
     this.caricaHackathon(this.id);
@@ -68,7 +67,7 @@ export class HackathonDetail implements OnInit {
     return this.teamService.getIscrizioniTeam().pipe(
       map((iscrizioni) => ({
         hackathon,
-        iscritto: iscrizioni.includes(hackathon.nome)
+        iscritto: iscrizioni.includes(hackathon.id)
       })),
       catchError((errore: HttpErrorResponse) => {
         if (errore.status === 404) {
@@ -92,8 +91,7 @@ export class HackathonDetail implements OnInit {
       next: ({ iscritto }) => {
         this.iscritto.set(iscritto);
       },
-      error: (error) => {
-        console.error('Errore durante il recupero dei dettagli dell\'hackathon:', error);
+      error: () => {
         this.erroreCaricamento.set('Errore durante il recupero dei dettagli dell\'hackathon.');
       }
     }

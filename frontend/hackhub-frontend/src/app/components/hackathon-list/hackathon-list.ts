@@ -36,9 +36,6 @@ export class HackathonList implements OnInit {
       {
         next: (h) => {
           this.hackathons.set(h);
-        },
-        error: (errore) => {
-          console.error('Errore nella ricerca degli hackathon', errore);
         }
       });
   }
