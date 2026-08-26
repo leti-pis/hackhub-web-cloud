@@ -105,14 +105,14 @@ class RispondeRichiesteSupportoBoundaryIT extends BaseHttpIT {
 
         Staff staff = new Staff(repositoryUtente.findByNomeUtente(MENTORE).orElseThrow(), RuoloStaff.MENTORE);
         Hackathon hackathon = new Hackathon("HackathonTest", new Periodo(
-                LocalDate.of(2026, 6, 20),
-                LocalDate.of(2026, 6, 22)
+                LocalDate.of(2099, 6, 20),
+                LocalDate.of(2099, 6, 22)
         ),
                 new BigDecimal("1500.00"),
                 "Camerino",
                 5,
                 3,
-                LocalDateTime.of(2026, 6, 10, 23, 59),
+                LocalDateTime.of(2099, 6, 10, 23, 59),
                 "Regolamento di prova",
                 20);
         staff.setHackathon(hackathon);
@@ -135,14 +135,14 @@ class RispondeRichiesteSupportoBoundaryIT extends BaseHttpIT {
     void rispondiRichiestaSupporto_notFound_notFound() throws Exception {
         // staff esiste
         Hackathon hackathon = new Hackathon("HackathonTest", new Periodo(
-                LocalDate.of(2026, 6, 20),
-                LocalDate.of(2026, 6, 22)
+                LocalDate.of(2099, 6, 20),
+                LocalDate.of(2099, 6, 22)
         ),
                 new BigDecimal("1500.00"),
                 "Camerino",
                 5,
                 3,
-                LocalDateTime.of(2026, 6, 10, 23, 59),
+                LocalDateTime.of(2099, 6, 10, 23, 59),
                 "Regolamento di prova",
                 20);
         repositoryHackathon.saveAndFlush(hackathon);

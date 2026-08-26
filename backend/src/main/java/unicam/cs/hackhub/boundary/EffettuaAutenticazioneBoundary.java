@@ -34,10 +34,10 @@ public class EffettuaAutenticazioneBoundary {
      * @return la risposta
      */
     @PostMapping("/registrazione")
-    public ResponseEntity<Void> attivaRegistrazione(
+    public ResponseEntity<AuthResponse> attivaRegistrazione(
             @Valid @RequestBody RegisterRequest request) {
-        handler.attivaRegistrazione(request); // Avvio la registrazione
-        return ResponseEntity.status(HttpStatus.CREATED).build(); // Ritorno il codice di stato created
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(handler.attivaRegistrazione(request));
     }
 
     /**

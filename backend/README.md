@@ -1,334 +1,197 @@
-# HackHub
+# HackHub Backend
 
-Backend Spring Boot per la gestione di hackathon, team, sottomissioni, valutazioni, richieste e notifiche.
+Spring Boot backend for HackHub, a platform that manages hackathons, teams, staff assignments, registrations, submissions, evaluations, requests, and notifications.
 
-## Indice
-- [Funzionalita principali](#funzionalita-principali)
-- [Stack tecnologico](#stack-tecnologico)
-- [Architettura](#architettura)
-- [Prerequisiti](#prerequisiti)
-- [Configurazione ambiente](#configurazione-ambiente)
-- [Avvio locale](#avvio-locale)
-- [Autenticazione](#autenticazione)
-- [Formato errori API](#formato-errori-api)
-- [REST API Reference](#rest-api-reference)
-- [Esempi cURL](#esempi-curl)
-- [Struttura progetto](#struttura-progetto)
-- [Test](#test)
-- [Troubleshooting](#troubleshooting)
-- [Sicurezza](#sicurezza)
-- [Contributi](#contributi)
-- [Roadmap](#roadmap)
-- [Licenza](#licenza)
-- [Autori](#autori)
+The backend exposes REST APIs under `/api`. The Angular application in `../frontend` is a separate client and reaches these APIs through its development proxy.
 
-## Funzionalita principali
-- Registrazione e login con JWT.
-- Creazione e gestione hackathon (staff, iscrizioni, espulsioni, vincitore, liquidazione premio).
-- Gestione team (creazione, cambio nome, inviti, espulsioni, scioglimento, passaggio leadership).
-- Sottomissioni progetto e valutazioni da parte del giudice.
-- Richieste/notifiche e flussi di assistenza/call mentore-team.
+## Technologies
 
-## Stack tecnologico
 - Java 21
-- Spring Boot
-- Spring Security + JWT
-- Spring Data JPA (Hibernate)
-- MySQL
-- Docker Compose
-- Gradle
+- Spring Boot 4.0.2 and Spring Web
+- Spring Security with a custom JWT bearer filter
+- JJWT 0.12.7
+- Spring Data JPA and Hibernate
+- Jakarta Bean Validation
+- MySQL 8
+- Gradle Wrapper
+- Docker Compose for the MySQL development database
+- JUnit 5, Spring Test, MockMvc, Spring Security Test, and an isolated in-memory H2 test database
 
-## Architettura
-- `boundary`: controller REST (ingresso HTTP).
-- `handler`: logica applicativa/casi d'uso.
-- `domain/implementazione`: modello di dominio.
-- `repository`: accesso dati JPA.
-- `servizi`: servizi infrastrutturali (JWT, notifiche, scheduler).
+## Requirements
 
-Pattern principali presenti:
-- `State` per ciclo di vita hackathon.
-- `Builder` per costruzione hackathon.
+- JDK 21
+- Docker and Docker Compose, unless a compatible MySQL instance is already available
 
-## Prerequisiti
-- Java 21
-- Docker + Docker Compose
-- (opzionale) MySQL locale se non usi container
+The Gradle installation is not required because the repository includes the Gradle Wrapper.
 
-## Configurazione ambiente
+## Project structure
 
-### 1) Crea il file locale
-
-```bash
-cp .env.example .env
+```text
+backend/
+  src/main/java/unicam/cs/hackhub/
+    boundary/       REST controllers and API DTOs
+    handler/        application use cases and transaction boundaries
+    domain/         domain entities, roles, and hackathon states
+    repository/     Spring Data JPA repositories
+    servizi/        JWT, notifications, scheduling, and external-service abstractions
+  src/main/resources/
+    application.properties
+  src/test/java/
+    unicam/cs/hackhub/
+  docker-compose.yml
+  .env.example
+  build.gradle
 ```
 
-Su Windows PowerShell:
+## Environment configuration
+
+`src/main/resources/application.properties` is the single Spring configuration source committed for the backend. It optionally imports a local `backend/.env` file:
+
+```properties
+spring.config.import=optional:file:.env[.properties]
+```
+
+Create a local file from the example before running the application:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-### 2) Variabili usate
+Do not commit `.env`. It is ignored by Git and must contain environment-specific credentials and secrets.
 
-| Variabile | Descrizione | Esempio |
+| Variable | Purpose | Example/default |
 |---|---|---|
-| `MYSQL_DATABASE` | Nome DB container MySQL | `hackhub` |
-| `MYSQL_USER` | Utente MySQL app | `hackhub` |
-| `MYSQL_PASSWORD` | Password utente MySQL | `change_me` |
-| `MYSQL_ROOT_PASSWORD` | Password root MySQL | `change_me` |
-| `MYSQL_PORT` | Porta host MySQL | `3306` |
-| `DB_HOST` | Host DB usato da Spring | `localhost` |
-| `DB_PORT` | Porta DB usata da Spring | `3306` |
-| `DB_NAME` | Nome DB usato da Spring | `hackhub` |
-| `DB_USERNAME` | Utente DB usato da Spring | `hackhub` |
-| `DB_PASSWORD` | Password DB usata da Spring | `change_me` |
-| `APP_JWT_SECRET` | Secret JWT (min 32 char) | `replace_with_long_random_secret` |
-| `APP_JWT_EXPIRATION_MS` | Scadenza token in ms | `3600000` |
+| `MYSQL_DATABASE` | Database created by Docker Compose | `hackhub` |
+| `MYSQL_USER` | MySQL application user created by Docker Compose | `hackhub` |
+| `MYSQL_PASSWORD` | Password for the MySQL application user | no secure default |
+| `MYSQL_ROOT_PASSWORD` | MySQL root password | no secure default |
+| `MYSQL_PORT` | MySQL port exposed on the host | `3306` |
+| `DB_HOST` | MySQL host used by Spring Boot | `localhost` |
+| `DB_PORT` | MySQL port used by Spring Boot | `3306` |
+| `DB_NAME` | Database used by Spring Boot | `hackhub` |
+| `DB_USERNAME` | Database username used by Spring Boot | `hackhub` |
+| `DB_PASSWORD` | Database password used by Spring Boot | no secure default |
+| `SERVER_PORT` | Backend HTTP port | `8080` |
+| `APP_JWT_SECRET` | HMAC signing secret; use at least 32 random characters | required |
+| `APP_JWT_EXPIRATION_MS` | JWT lifetime in milliseconds | `3600000` |
 
-## Avvio locale
+`SERVER_PORT` can be omitted because `application.properties` defaults to `8080`. It is included in `.env.example` so the effective port remains explicit.
 
-### 1) Avvia MySQL con Docker Compose
+## Database and persistence
 
-```bash
+Start the development MySQL database from `backend/`:
+
+```powershell
 docker compose up -d
 ```
 
-### 2) Avvia backend
+Docker Compose starts only MySQL 8 and stores its data in the named volume `hackhub_mysql_data`. It does not containerize the backend or frontend.
 
-```bash
-./gradlew bootRun
+The effective JPA settings are:
+
+```properties
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.open-in-view=false
 ```
 
-Su Windows PowerShell:
+Hibernate therefore updates the schema during startup. The project does not currently include versioned Flyway or Liquibase migrations.
+
+## Running the backend
+
+From `backend/`, after configuring the environment and starting MySQL:
 
 ```powershell
 .\gradlew.bat bootRun
 ```
 
-Base URL API locale: `http://localhost:8081`
+The default API base URL is:
 
-## Autenticazione
-- Endpoint pubblici: `/api/autenticazione/**`
-- Tutti gli altri endpoint richiedono JWT Bearer.
-- Eccezione pubblica: `GET /api/hackathon` (lista info hackathon).
+```text
+http://localhost:8080/api
+```
 
-Header richiesto:
+The Angular development proxy currently targets `http://192.168.117.129:8080`. This is a private-network address for the machine that hosts the backend in that development setup; it is not evidence of a public or cloud deployment. If Angular and Spring Boot run on different machines, the machine at that address must run the backend on port `8080` and be reachable from the frontend development machine.
+
+## Main API groups
+
+- `/api/autenticazione`: registration and login
+- `/api/hackathon`: public listing/details, creation, team registration, and hackathon management
+- `/api/team`: team creation, membership, invitations, leadership, and the current user's team
+- `/api/sottomissioni`: submission and evaluation operations
+- `/api/richieste`: acceptance and rejection of pending requests
+- `/api/notifiche`: user notifications
+- `/api/call`, `/api/assistenza`, and `/api/richieste-supporto`: mentor/team support flows
+
+The frontend currently uses these contracts:
+
+- `POST /api/autenticazione/registrazione` returns `201 Created` with `{ token, tipo, nomeUtente }`.
+- `POST /api/autenticazione/accesso` returns `200 OK` with `{ token, tipo, nomeUtente }`.
+- `GET /api/hackathon` returns the public hackathon list.
+- `GET /api/hackathon/{id}` returns one public hackathon by ID.
+- `POST /api/hackathon` returns `200 OK` with the complete hackathon representation expected by the Angular `Hackathon` model.
+- `POST /api/hackathon/{nomeHackathon}/iscrizioni` returns `204 No Content`.
+- `GET /api/team/mio` returns `{ nomeTeam, nomeLeader, nomiMembri }`.
+- `GET /api/team/iscrizioni` returns the IDs of the hackathons associated with the current team.
+
+API errors are returned as JSON:
+
+```json
+{
+  "message": "Error description"
+}
+```
+
+Application exceptions are centrally mapped to the appropriate `400`, `403`, `404`, `409`, or `500` HTTP status.
+
+## Authentication and security
+
+Registration stores passwords using BCrypt. Login and registration return a signed JWT with the username as subject and a configured expiration time.
+
+Send the token to protected endpoints with:
 
 ```http
 Authorization: Bearer <token>
 ```
 
-### Login
-`POST /api/autenticazione/accesso`
+The following endpoints are public:
 
-Request JSON:
+- `/api/autenticazione/**`
+- `GET /api/hackathon`
+- `GET /api/hackathon/{id}`
 
-```json
-{
-  "nomeUtente": "mario",
-  "password": "Password123!"
-}
+All other requests require authentication. The JWT contains no role claims. Team and hackathon permissions are checked in the application handlers against persisted domain roles such as team leader, organizer, mentor, and judge.
+
+## Hackathon scheduler
+
+Scheduling is enabled with `@EnableScheduling`. `SchedulerHackathon` runs every 60 seconds and invokes the existing temporal-event handler, which:
+
+- closes expired registration windows;
+- starts eligible hackathons;
+- moves completed events into the evaluation phase.
+
+The scheduler uses the same database and domain state rules as the REST use cases.
+
+## External services
+
+Calendar and payment are represented by interfaces, but the current handlers use `CalendarioMock` and `SistemaDiPagamentoMock`. They are simulations, not integrations with real external providers.
+
+## Build and tests
+
+Compile and package the backend:
+
+```powershell
+.\gradlew.bat build
 ```
 
-Response JSON:
-
-```json
-{
-  "token": "<jwt>",
-  "tipo": "Bearer"
-}
-```
-
-## Formato errori API
-
-Error response standard:
-
-```json
-{
-  "message": "descrizione errore"
-}
-```
-
-Mappatura principale:
-- `400` `BadRequestException`, validazione DTO, `IllegalArgumentException`
-- `403` `ForbiddenException`
-- `404` `NotFoundException`
-- `409` `ConflictException`, `TransizioneNonConsentitaException`
-- `500` eccezioni non gestite
-
-## REST API Reference
-
-Nota: dove indicato `TEXT`, il body e plain text (`Content-Type: text/plain`).
-
-### 1) Autenticazione
-- `POST /api/autenticazione/registrazione` - registra utente
-- `POST /api/autenticazione/accesso` - login e JWT
-
-`RegisterRequest`:
-- `nomeUtente` string
-- `email` email
-- `password` string (min 6)
-
-### 2) Hackathon - creazione/gestione
-- `POST /api/hackathon` - crea hackathon (organizzatore autenticato)
-- `POST /api/hackathon/{nomeHackathon}/iscrizioni` - iscrive il team del leader
-- `DELETE /api/hackathon/{nomeHackathon}/iscrizioni/mia` - annulla iscrizione del proprio team
-- `POST /api/hackathon/{nomeHackathon}/violazione?nomeTeam=...` - mentore segnala violazione
-- `POST /api/hackathon/{nomeHackathon}/nomine-mentori?nomeUtenteDaInvitare=...` - organizzatore invita mentore
-- `DELETE /api/hackathon/{nomeHackathon}` - elimina hackathon
-- `POST /api/hackathon/{nomeHackathon}/team/{nomeTeam}/espulsione` - espelle team
-- `POST /api/hackathon/{nomeHackathon}/vincitore?nomeTeam=...` - proclama vincitore
-- `POST /api/hackathon/{nomeHackathon}/liquidazione-premio?nomeTeam=...` - liquida premio
-
-`HackathonRequest` (POST `/api/hackathon`):
-- `nome` string
-- `dataInizio` date (`yyyy-MM-dd`)
-- `dataFine` date (`yyyy-MM-dd`)
-- `luogo` string
-- `premio` number
-- `teamMin` int [3..6]
-- `teamMax` int [3..6]
-- `maxIscrizioni` int >= 1
-- `regolamento` string
-- `scadenzaIscrizioni` datetime (`yyyy-MM-dd'T'HH:mm:ss`)
-- `nomeGiudice` string
-- `nomeMentori` string[] (min 1)
-
-### 3) Team
-- `POST /api/team` - crea team (`TEXT`: nome team)
-- `PATCH /api/team` - cambia nome team (`TEXT`: nuovo nome)
-- `DELETE /api/team/membri/me` - esci dal team
-- `DELETE /api/team/mio` - sciogli team
-- `DELETE /api/team/membri/{nomeMembro}` - espelli membro
-- `POST /api/team/leader?nomeMembro=...` - trasferimento ruolo leader immediato (senza richiesta)
-- `POST /api/team/mio/invito?nomeUtenteDaInvitare=...` - invita utente nel team
-
-### 4) Sottomissioni e valutazioni
-- `POST /api/sottomissioni/{nomeHackathon}` - invia sottomissione (`TEXT`: link)
-- `DELETE /api/sottomissioni/{nomeHackathon}` - rimuove sottomissione
-- `POST /api/sottomissioni/{idSottomissione}/valutazione` - inserisce/aggiorna valutazione
-
-`ValutazioneRequest`:
-- `giudizio` string non vuota
-- `punteggio` int [0..10]
-
-### 5) Call e assistenza
-- `POST /api/call/proposta` - mentore propone call
-- `POST /api/assistenza/richiesta?nomeMentore=...&nomeHackathon=...` - leader richiede assistenza
-- `POST /api/richieste-supporto/risposta?idNotifica=...` - mentore risponde a richiesta supporto
-
-`PropostaCallRequest`:
-- `idHackathon` string
-- `idTeam` string
-- `data` date (`yyyy-MM-dd`)
-- `ora` time (`HH:mm:ss`)
-
-### 6) Richieste
-- `POST /api/richieste/{idRichiesta}/accetta` - accetta richiesta
-- `POST /api/richieste/{idRichiesta}/rifiuta` - rifiuta richiesta
-
-Le richieste gestite in questo blocco sono inviti team/staff e proposte call.
-Il cambio leader del team avviene direttamente tramite `POST /api/team/leader`.
-
-### 7) Visualizzazione
-- `GET /api/hackathon/{nomeHackathon}/valutazioni`
-- `GET /api/hackathon/{nomeHackathon}/sottomissioni`
-- `GET /api/hackathon/{nomeHackathon}/iscrizioni`
-- `GET /api/richieste`
-- `GET /api/notifiche`
-- `GET /api/hackathon` (pubblico, non richiede JWT)
-
-## Esempi cURL
-
-Registrazione:
-
-```bash
-curl -X POST http://localhost:8081/api/autenticazione/registrazione \
-  -H "Content-Type: application/json" \
-  -d '{"nomeUtente":"mario","email":"mario@example.com","password":"Password123!"}'
-```
-
-Login:
-
-```bash
-curl -X POST http://localhost:8081/api/autenticazione/accesso \
-  -H "Content-Type: application/json" \
-  -d '{"nomeUtente":"mario","password":"Password123!"}'
-```
-
-Creazione team (richiede token):
-
-```bash
-curl -X POST http://localhost:8081/api/team \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: text/plain" \
-  -d 'TeamRocket'
-```
-
-Valutazione sottomissione (richiede token):
-
-```bash
-curl -X POST http://localhost:8081/api/sottomissioni/S-123/valutazione \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{"giudizio":"Ottimo","punteggio":9}'
-```
-
-## Struttura progetto
-
-```text
-src/
-  main/
-    java/unicam/cs/hackhub/
-      boundary/
-      handler/
-      domain/
-      repository/
-      servizi/
-    resources/
-      application.properties
-      application.yml
-  test/
-    java/unicam/cs/hackhub/
-      testHttp/
-```
-
-## Test
-
-```bash
-./gradlew test
-```
-
-Su Windows PowerShell:
+Run the backend test suite:
 
 ```powershell
 .\gradlew.bat test
 ```
 
-## Troubleshooting
-- Errore connessione DB: verifica che `docker compose ps` mostri MySQL `Up` e che `DB_*`/`MYSQL_*` siano coerenti.
-- `401` sugli endpoint protetti: controlla header `Authorization` e scadenza token.
-- Errori validazione (`400`): verifica payload e tipi campi secondo i DTO.
+Tests use the dedicated configuration in `src/test/resources/application.properties` and an in-memory H2 database in MySQL compatibility mode. They do not connect to or truncate the development MySQL database. Test reports are generated under `build/reports/tests/test/`.
 
-## Sicurezza
-- Non committare `.env` (ignorato da `.gitignore`).
-- Usa un `APP_JWT_SECRET` robusto e diverso per ambiente.
-- Se credenziali sono state esposte, ruotale e valuta pulizia history Git.
+## Current Docker and deployment status
 
-## Contributi
-1. Crea branch feature.
-2. Mantieni test verdi (`./gradlew test`).
-3. Apri PR con descrizione modifiche e impatto API.
-
-## Roadmap
-- Esposizione documentazione OpenAPI/Swagger.
-- Maggiore copertura test su scenari edge e sicurezza.
-- Hardening osservabilita (metriche/log strutturati).
-
-## Licenza
-Al momento non e specificata una licenza esplicita nel repository.
-
-## Autori
-- Letizia Pistola
-- Giada Branchesi
-- Jhonatan Silenzi
+Only MySQL is containerized. There are no backend or frontend Dockerfiles, no full application Compose stack, no CI/CD workflow, and no committed cloud-provider deployment configuration. The repository therefore supports local or private-network development but does not yet define a complete production deployment.

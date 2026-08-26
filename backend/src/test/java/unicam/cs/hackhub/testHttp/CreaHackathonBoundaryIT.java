@@ -33,6 +33,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -97,7 +98,24 @@ class CreaHackathonBoundaryIT extends BaseHttpIT {
 
 
         eseguiCreazione(body)
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.nome").value(NOME_HACKATHON))
+                .andExpect(jsonPath("$.dataInizio").value("2099-06-20"))
+                .andExpect(jsonPath("$.dataFine").value("2099-06-22"))
+                .andExpect(jsonPath("$.luogo").value("Camerino"))
+                .andExpect(jsonPath("$.premio").value(1500.00))
+                .andExpect(jsonPath("$.teamMin").value(3))
+                .andExpect(jsonPath("$.teamMax").value(5))
+                .andExpect(jsonPath("$.regolamento").value("Regolamento di prova"))
+                .andExpect(jsonPath("$.scadenzaIscrizioni").value("2099-06-10T23:59:00"))
+                .andExpect(jsonPath("$.stato").value("ISCRIZIONI_APERTE"))
+                .andExpect(jsonPath("$.numeroTeamIscritti").value(0))
+                .andExpect(jsonPath("$.maxIscrizioni").value(20))
+                .andExpect(jsonPath("$.postiRimanenti").value(20))
+                .andExpect(jsonPath("$.nomeGiudice").doesNotExist())
+                .andExpect(jsonPath("$.nomeMentori").isEmpty())
+                .andExpect(jsonPath("$.nomeOrganizzatore").value(ORGANIZZATORE));
 
 
         Hackathon hackathon = repositoryHackathon.findByNome(NOME_HACKATHON)
@@ -111,7 +129,7 @@ class CreaHackathonBoundaryIT extends BaseHttpIT {
                 () -> assertEquals(3, hackathon.getTeamMin()),
                 () -> assertEquals(5, hackathon.getTeamMax()),
                 () -> assertEquals(20, hackathon.getMaxIscrizioni()),
-                () -> assertEquals(LocalDateTime.of(2026, 6, 10, 23, 59), hackathon.getScadenzaIscrizioni())
+                () -> assertEquals(LocalDateTime.of(2099, 6, 10, 23, 59), hackathon.getScadenzaIscrizioni())
         );
 
 
@@ -150,7 +168,7 @@ class CreaHackathonBoundaryIT extends BaseHttpIT {
 
 
     @Test
-    void creaHackathon_nomeGiaEsistente_forbidden() throws Exception {
+    void creaHackathon_nomeGiaEsistente_conflict() throws Exception {
         repositoryHackathon.saveAndFlush(creaHackathonValido());
 
 
@@ -163,7 +181,7 @@ class CreaHackathonBoundaryIT extends BaseHttpIT {
 
 
         eseguiCreazione(body)
-                .andExpect(status().isForbidden());
+                .andExpect(status().isConflict());
 
 
         verify(servizioNotifiche, never()).creaInvitoStaff(any(), any(), any(), any());
@@ -171,7 +189,7 @@ class CreaHackathonBoundaryIT extends BaseHttpIT {
 
 
     @Test
-    void creaHackathon_organizzatoreCoincideConGiudice_forbidden() throws Exception {
+    void creaHackathon_organizzatoreCoincideConGiudice_badRequest() throws Exception {
         String body = jsonCreaHackathon(
                 ORGANIZZATORE,
                 """
@@ -181,7 +199,7 @@ class CreaHackathonBoundaryIT extends BaseHttpIT {
 
 
         eseguiCreazione(body)
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
 
 
         assertFalse(repositoryHackathon.findByNome(NOME_HACKATHON).isPresent());
@@ -190,7 +208,7 @@ class CreaHackathonBoundaryIT extends BaseHttpIT {
 
 
     @Test
-    void creaHackathon_giudicePresenteAncheTraMentori_forbidden() throws Exception {
+    void creaHackathon_giudicePresenteAncheTraMentori_badRequest() throws Exception {
         String body = jsonCreaHackathon(
                 GIUDICE,
                 """
@@ -200,7 +218,7 @@ class CreaHackathonBoundaryIT extends BaseHttpIT {
 
 
         eseguiCreazione(body)
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
 
 
         assertFalse(repositoryHackathon.findByNome(NOME_HACKATHON).isPresent());
@@ -248,15 +266,15 @@ class CreaHackathonBoundaryIT extends BaseHttpIT {
         return """
                {
                  "nome": "%s",
-                 "dataInizio": "2026-06-20",
-                 "dataFine": "2026-06-22",
+                 "dataInizio": "2099-06-20",
+                 "dataFine": "2099-06-22",
                  "luogo": "Camerino",
                  "premio": 1500.00,
                  "teamMin": 3,
                  "teamMax": 5,
                  "regolamento": "Regolamento di prova",
                  "maxIscrizioni": 20,
-                 "scadenzaIscrizioni": "2026-06-10T23:59:00",
+                 "scadenzaIscrizioni": "2099-06-10T23:59:00",
                  "nomeGiudice": "%s",
                  "nomeMentori": %s
                }
@@ -279,14 +297,14 @@ class CreaHackathonBoundaryIT extends BaseHttpIT {
         return new Hackathon(
                 CreaHackathonBoundaryIT.NOME_HACKATHON,
                 new Periodo(
-                        LocalDate.of(2026, 6, 20),
-                        LocalDate.of(2026, 6, 22)
+                        LocalDate.of(2099, 6, 20),
+                        LocalDate.of(2099, 6, 22)
                 ),
                 new BigDecimal("1500.00"),
                 "Camerino",
                 5,
                 3,
-                LocalDateTime.of(2026, 6, 10, 23, 59),
+                LocalDateTime.of(2099, 6, 10, 23, 59),
                 "Regolamento di prova",
                 20
         );

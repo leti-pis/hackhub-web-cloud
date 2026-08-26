@@ -59,7 +59,25 @@ public class CreaHackathonHandler {
         Hackathon hackathon = builder.getRisultato();
         Staff organizzatore = gestisciOrganizzatore(nomeUtente, hackathon);
         gestisciInvitiStaff(organizzatore, request.nomeMentori(), request.nomeGiudice());
-        return new HackathonCreatedResponse(hackathon.getIdHackathon(), hackathon.getNome());
+        return new HackathonCreatedResponse(
+                hackathon.getIdHackathon(),
+                hackathon.getNome(),
+                hackathon.getPeriodo().getDataInizio(),
+                hackathon.getPeriodo().getDataFine(),
+                hackathon.getLuogo(),
+                hackathon.getPremio(),
+                hackathon.getTeamMin(),
+                hackathon.getTeamMax(),
+                hackathon.getRegolamento(),
+                hackathon.getScadenzaIscrizioni(),
+                hackathon.getStatoEnum(),
+                hackathon.getIscrizioni().size(),
+                hackathon.getMaxIscrizioni(),
+                hackathon.getMaxIscrizioni() - hackathon.getIscrizioni().size(),
+                null,
+                List.of(),
+                organizzatore.getUtente().getNomeUtente()
+        );
     }
 
     /**

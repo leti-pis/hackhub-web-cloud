@@ -5,7 +5,7 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 @Sql(
         statements = {
-                "SET FOREIGN_KEY_CHECKS=0",
+                "SET REFERENTIAL_INTEGRITY FALSE",
                 "TRUNCATE TABLE valutazioni",
                 "TRUNCATE TABLE sottomissioni",
                 "TRUNCATE TABLE richiesta",
@@ -16,7 +16,7 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
                 "TRUNCATE TABLE team",
                 "TRUNCATE TABLE hackathon",
                 "TRUNCATE TABLE utenti",
-                "SET FOREIGN_KEY_CHECKS=1"
+                "SET REFERENTIAL_INTEGRITY TRUE"
         },
         executionPhase = ExecutionPhase.BEFORE_TEST_METHOD
 )

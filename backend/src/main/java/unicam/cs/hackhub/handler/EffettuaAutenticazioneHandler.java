@@ -38,7 +38,7 @@ public class EffettuaAutenticazioneHandler {
      * @param request il dto di richiesta di registrazione
      */
     @Transactional
-    public void attivaRegistrazione(RegisterRequest request) {
+    public AuthResponse attivaRegistrazione(RegisterRequest request) {
         repositoryUtente.findByNomeUtente(request.nomeUtente()).ifPresent(u -> {
             throw new BadRequestException("Esiste già un utente con questo nome");
         });
@@ -47,6 +47,7 @@ public class EffettuaAutenticazioneHandler {
                 request.email(),
                 passwordEncoder.encode(request.password()));
         repositoryUtente.save(utente);
+        return new AuthResponse(servizioJwt.generaToken(utente), "Bearer", utente.getNomeUtente());
     }
 
     /**

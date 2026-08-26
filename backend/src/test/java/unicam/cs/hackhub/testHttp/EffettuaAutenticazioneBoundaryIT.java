@@ -57,7 +57,10 @@ class EffettuaAutenticazioneBoundaryIT extends BaseHttpIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isCreated())
-                .andExpect(content().string(""));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.tipo").value("Bearer"))
+                .andExpect(jsonPath("$.nomeUtente").value(NOME_UTENTE))
+                .andExpect(jsonPath("$.token").isNotEmpty());
 
         Utente utente = repositoryUtente.findByNomeUtente(NOME_UTENTE)
                 .orElseThrow(() -> new AssertionError("Utente non trovato nel database"));
@@ -95,6 +98,7 @@ class EffettuaAutenticazioneBoundaryIT extends BaseHttpIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.tipo").value("Bearer"))
+                .andExpect(jsonPath("$.nomeUtente").value(NOME_UTENTE))
                 .andExpect(jsonPath("$.token").isString())
                 .andExpect(jsonPath("$.token").isNotEmpty());
     }

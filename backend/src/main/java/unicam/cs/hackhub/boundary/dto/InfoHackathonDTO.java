@@ -23,8 +23,8 @@ public record InfoHackathonDTO(
         int numeroTeamIscritti,
         @Max(40) int maxIscrizioni,
         int postiRimanenti,
-        @NotBlank String nomeGiudice,
-        @NotEmpty @NotNull @Size(min = 1) java.util.List<@NotBlank String> nomeMentori,
+        String nomeGiudice,
+        @NotNull java.util.List<@NotBlank String> nomeMentori,
         @NotBlank String nomeOrganizzatore
 ) {
 }
