@@ -13,6 +13,11 @@ services:
       - "${MYSQL_PORT}:3306"
     volumes:
       - hackhub_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   backend:
     build:
@@ -29,8 +34,25 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "8080:8080"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8080/api/hackathon" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: hackhub-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
   hackhub_mysql_data:
