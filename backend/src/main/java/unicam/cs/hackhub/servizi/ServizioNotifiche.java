@@ -61,6 +61,7 @@ public class ServizioNotifiche {
 
     /**
      * Metodo che istanzia un Invito allo Staff di un hackathon
+     * L'invito è valido fino alla scadenza delle iscrizioni, durante la fase di nomina dello staff.
      *
      * @param nomeMittente il nome del mittente
      * @param destinatario il destinatario
@@ -75,7 +76,7 @@ public class ServizioNotifiche {
                 nomeMittente,
                 "Invito nello Staff di " + hackathon.getNome() + " come " + ruolo.name() + " da " + nomeMittente,
                 destinatario,
-                LocalDateTime.now(),
+                hackathon.getScadenzaIscrizioni(),
                 hackathon,
                 ruolo);
         repositoryRichiesta.save(invitoStaff);
