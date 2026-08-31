@@ -32,6 +32,7 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+      APP_DEMO_DATA_ENABLED: ${APP_DEMO_DATA_ENABLED:-false}
     ports:
       - "8080:8080"
     healthcheck:
