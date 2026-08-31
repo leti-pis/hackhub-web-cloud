@@ -128,6 +128,27 @@ docker compose down
 
 Questo comando conserva i dati del database. L'opzione `-v` elimina anche il volume e va usata solo se si vuole cancellare i dati.
 
+## Account demo
+
+Copiando `backend/.env.example` in `.env`, `APP_DEMO_DATA_ENABLED=true` abilita la creazione automatica dei dati demo all'avvio del backend. **Queste credenziali sono esclusivamente locali/demo: non abilitarle in ambienti pubblici o di produzione.** Le password sono salvate con il `PasswordEncoder` BCrypt già configurato, mai in chiaro.
+
+| Username | Password demo | Ruolo/funzione | Associazione |
+| --- | --- | --- | --- |
+| `leader1` | `Demo123!` | Leader del team | Team Alpha |
+| `membro1` | `Demo123!` | Membro del team | Team Alpha |
+| `membro2` | `Demo123!` | Membro del team | Team Alpha |
+| `organizzatore1` | `Demo123!` | ORGANIZZATORE | HackHub Demo |
+| `giudice1` | `Demo123!` | GIUDICE | HackHub Demo |
+| `mentore1` | `Demo123!` | MENTORE | HackHub Demo |
+
+I ruoli staff sono associati a **HackHub Demo**, non sono ruoli globali dell'utente. Gli inviti di giudice e mentore vengono creati e accettati tramite i casi d'uso esistenti.
+
+Alla prima creazione, l'hackathon si svolge a Camerino da 30 a 32 giorni dopo l'avvio; le iscrizioni scadono 7 giorni prima dell'inizio alle 23:59. Ha iscrizioni aperte, premio dimostrativo di 1000 euro, team da 3 a 6 membri e un massimo di 10 team. **Team Alpha non è preiscritto**: accedere con `leader1`, aprire l'hackathon e iscrivere il team permette di provare subito il flusso. Sottomissioni, assistenza e valutazioni restano soggette alle normali fasi dell'evento.
+
+I riavvii non duplicano utenti, team, hackathon, relazioni o inviti. Gli utenti sono identificati dallo username; team e hackathon dal nome. Le risorse già esistenti vengono lasciate inalterate, incluse password, ruoli, relazioni e date: le credenziali in tabella valgono per gli account creati dall'initializer. Eventuali appartenenze a team già presenti vengono rispettate e i conflitti segnalati nei log. Le date non vengono spostate ai riavvii e un evento già esistente non viene riaperto.
+
+Per disabilitare l'inizializzazione, impostare `APP_DEMO_DATA_ENABLED=false` in `backend/.env` e, dalla cartella `backend`, eseguire `docker compose up -d --force-recreate backend`. Senza questa variabile il valore predefinito è `false`. Disabilitarla non elimina i dati già creati.
+
 ## Sviluppo locale
 
 In alternativa a Docker per l'intera applicazione, frontend e backend possono essere avviati separatamente. Servono JDK 21, Node.js compatibile con Angular (ad esempio Node 22.12 o successivo della serie 22) e npm.
@@ -150,7 +171,7 @@ Dalla cartella `backend`, per creare il file JAR dell'applicazione senza eseguir
 
 Sono presenti test delle API con JUnit e MockMvc e test dell'autenticazione JWT. Il comando per eseguirli è `./gradlew test`; `./gradlew build` esegue sia la compilazione sia i test.
 
-**Prima di eseguire i test va configurato un database H2 temporaneo.** La dipendenza è presente, ma manca ancora una configurazione dedicata nel repository. I test svuotano le tabelle: non devono essere eseguiti sul database usato per la demo. I risultati vengono salvati in `backend/build/reports/tests/test/`.
+I test usano il database H2 in memoria configurato in `backend/src/test/resources/application.properties`, senza importare `.env` o accedere al MySQL della demo. I dati demo sono disattivati nei test ordinari e attivati esplicitamente nei test dell'initializer. I risultati vengono salvati in `backend/build/reports/tests/test/`.
 
 ### Frontend
 
@@ -171,7 +192,16 @@ La registrazione, l'accesso e la consultazione degli hackathon sono pubblici. Le
 
 ## CI/CD
 
-Non è ancora configurata una pipeline CI/CD. Compilazione, test e avvio con Docker vengono eseguiti manualmente.
+Il progetto utilizza **GitHub Actions** per eseguire automaticamente una pipeline di Continuous Integration ad ogni push e pull request.
+
+La pipeline contiene due job:
+
+- **Backend**: configura Java 21 e compila l'applicazione Spring Boot tramite Gradle.
+- **Frontend**: installa le dipendenze con `npm ci`, esegue i test Angular e verifica la build di produzione.
+
+La configurazione della pipeline si trova in `.github/workflows/ci.yml`.
+
+Il deployment tramite Docker Compose viene invece avviato manualmente.
 
 ## Diagrammi e documentazione
 
@@ -180,6 +210,12 @@ Nella cartella [backend/diagrammi](backend/diagrammi/) sono disponibili:
 - [Progetto Visual Paradigm](backend/diagrammi/Progetto%20HackHub.vpp), con diagrammi delle classi, delle interazioni e dei casi d'uso.
 - [Analisi degli attori e dei requisiti](backend/diagrammi/HACKHUB%20-%20Analisi.docx).
 - [Analisi nome-verbo per il diagramma delle classi](backend/diagrammi/ANALISI%20NOME-VERBO%20PER%20CLASS%20DIAGRAM.docx).
+
+Nella cartella [docs](docs/) sono disponibili anche il diagramma dell'architettura e il diagramma di deployment:
+
+![Diagramma dell'architettura](docs/architecture-diagram.png)
+
+![Diagramma di deployment](docs/deployment-diagram.png)
 
 ## Servizi esterni simulati
 
